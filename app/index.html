@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a2e1a">
+<meta name="description" content="AI triage assistant for Community Health Workers">
+<title>CHW Companion — Triage AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --forest:     #1a2e1a;
+    --moss:       #2d4a2d;
+    --sage:       #4a7c59;
+    --leaf:       #6fa87a;
+    --mist:       #e8f0e8;
+    --cream:      #f5f2eb;
+    --warm-white: #faf8f4;
+    --clay:       #c4855a;
+    --red:        #c0392b;
+    --orange:     #e67e22;
+    --yellow:     #d4a017;
+    --green:      #27ae60;
+    --text:       #1a1a1a;
+    --text-muted: #5a6a5a;
+    --border:     #d4ddd4;
+    --shadow:     rgba(26,46,26,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--warm-white);
+    box-shadow: 0 0 60px var(--shadow);
+    padding-bottom: 60px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--forest);
+    color: white;
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    background: var(--sage);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .app-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    line-height: 1;
+  }
+
+  .app-sub {
+    font-size: 11px;
+    color: var(--leaf);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .status-badge {
+    margin-left: auto;
+    border: 1px solid var(--leaf);
+    color: var(--leaf);
+    background: rgba(111,168,122,0.25);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.3s;
+  }
+
+  .status-badge.offline {
+    border-color: var(--clay);
+    color: var(--clay);
+    background: rgba(196,133,90,0.18);
+  }
+
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── Safety disclaimer banner (always visible) ── */
+  .safety-banner {
+    background: #fdf6e3;
+    color: #7a5d00;
+    border-bottom: 1px solid #ead9a6;
+    padding: 8px 16px;
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    position: sticky;
+    top: 77px;
+    z-index: 99;
+  }
+
+  .safety-banner strong { font-weight: 600; }
+
+  /* ── Screens ── */
+  .screen {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    padding: 24px;
+    gap: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .screen.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .card-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  /* ── Fields ── */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .field input:focus, .field select:focus {
+    outline: 2px solid var(--sage);
+    outline-offset: -1px;
+  }
+
+  .lang-row {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lang-row select {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ── Quick symptom chips ── */
+  .quick-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .quick-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+
+  .chip:active { transform: scale(0.96); }
+
+  .chip.selected {
+    background: var(--sage);
+    color: white;
+    border-color: var(--sage);
+  }
+
+  /* ── Symptom area ── */
+  .symptom-area {
+    position: relative;
+  }
+
+  .symptom-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    background: var(--cream);
+    color: var(--text);
+  }
+
+  .symptom-textarea:focus {
+    outline: 2px solid var(--sage);
+    outline-offset: -1px;
+  }
+
+  .char-count {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* ── Primary button ── */
+  .btn-triage {
+    background: var(--forest);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-triage:active {
+    background: var(--moss);
+    transform: scale(0.98);
+  }
+
+  .btn-triage:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* ── Loading screen ── */
+  .spinner-ring {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--mist);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 60px auto 20px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    text-align: center;
+    color: var(--forest);
+    margin-bottom: 6px;
+  }
+
+  .loading-sub {
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .loading-steps {
+    max-width: 320px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .loading-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    opacity: 0.45;
+    transition: all 0.3s;
+  }
+
+  .loading-step.done {
+    opacity: 1;
+    color: var(--sage);
+  }
+
+  .step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.2s;
+  }
+
+  .loading-step.done .step-dot {
+    background: var(--sage);
+    box-shadow: 0 0 0 4px rgba(74,124,89,0.2);
+  }
+
+  /* ── Urgency banner ── */
+  .urgency-banner {
+    border-radius: 16px;
+    padding: 20px 22px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 16px var(--shadow);
+  }
+
+  .urgency-banner.red    { background: linear-gradient(135deg,#c0392b,#922b21); }
+  .urgency-banner.orange { background: linear-gradient(135deg,#e67e22,#ba6820); }
+  .urgency-banner.yellow { background: linear-gradient(135deg,#d4a017,#a97f0f); color:#fff; }
+  .urgency-banner.green  { background: linear-gradient(135deg,#27ae60,#1e8449); }
+  .urgency-banner.pending { background: linear-gradient(135deg,#7a8a7a,#4d584d); }
+
+  .urgency-icon {
+    font-size: 36px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .urgency-level {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 2px;
+    letter-spacing: -0.3px;
+  }
+
+  .urgency-concern {
+    font-size: 13px;
+    opacity: 0.92;
+    line-height: 1.35;
+  }
+
+  .urgency-concern.skeleton {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    color: transparent;
+    border-radius: 4px;
+    animation: shimmer 1.4s infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.85; }
+  }
+
+  /* ── Action card ── */
+  .action-card {
+    background: var(--forest);
+    color: white;
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+
+  .action-label {
+    font-size: 11px;
+    color: var(--leaf);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .action-text {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ── List cards ── */
+  .list-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .list-card-header {
+    background: var(--mist);
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--forest);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .list-card .body {
+    padding: 10px 16px 14px;
+    min-height: 50px;
+    position: relative;
+  }
+
+  .list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .list-icon {
+    flex-shrink: 0;
+    width: 20px;
+    color: var(--sage);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .do-not-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #922b21;
+  }
+
+  .do-not-item .list-icon { color: var(--red); }
+
+  /* Loading skeleton for detail cards */
+  .detail-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .detail-loading-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--sage);
+    border-radius: 50%;
+    animation: bounce 1.4s infinite both;
+  }
+
+  .detail-loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .detail-loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+    40%           { transform: scale(1);   opacity: 1; }
+  }
+
+  /* ── Confidence ── */
+  .confidence-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .confidence-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .confidence-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+
+  .confidence-badge.high   { background: #d4edda; color: #155724; }
+  .confidence-badge.medium { background: #fff3cd; color: #856404; }
+  .confidence-badge.low    { background: #f8d7da; color: #721c24; }
+
+  .disclaimer {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── New-assessment button ── */
+  .btn-new {
+    background: white;
+    color: var(--forest);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+  }
+
+  .btn-new:active {
+    background: var(--mist);
+    transform: scale(0.98);
+  }
+
+  /* ── Priority queue ── */
+  .queue-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .queue-empty .empty-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  .queue-section-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 500;
+    margin-top: 8px;
+    margin-bottom: 6px;
+  }
+
+  .queue-item {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-left-width: 4px;
+    transition: all 0.15s;
+  }
+
+  .queue-item:active { transform: scale(0.99); }
+  .queue-item.red    { border-left-color: var(--red); }
+  .queue-item.orange { border-left-color: var(--orange); }
+  .queue-item.yellow { border-left-color: var(--yellow); }
+  .queue-item.green  { border-left-color: var(--green); }
+
+  .queue-icon {
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .queue-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .queue-top-line {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .queue-patient {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+
+  .queue-urgency {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .queue-urgency.red    { background: #fadbd8; color: var(--red); }
+  .queue-urgency.orange { background: #fae5d3; color: #b9641e; }
+  .queue-urgency.yellow { background: #fcf3cf; color: #a97f0f; }
+  .queue-urgency.green  { background: #d5f5e3; color: var(--green); }
+
+  .queue-symptom {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .queue-time {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .queue-action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--forest);
+    cursor: pointer;
+  }
+
+  .btn-secondary.danger { color: var(--red); }
+  .btn-secondary:active { background: var(--mist); }
+
+  /* ── Bottom tab bar ── */
+  .tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 100;
+    height: 60px;
+  }
+
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    user-select: none;
+    transition: color 0.15s;
+  }
+
+  .tab.active {
+    color: var(--sage);
+  }
+
+  .tab-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .tab-count {
+    background: var(--red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    position: absolute;
+    margin-left: 14px;
+    margin-top: -22px;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  .tab-count.zero { display: none; }
+
+  /* ── Powered by badge ── */
+  .powered-by {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .gemma-badge {
+    background: #1a73e8;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <div class="logo">🏥</div>
+      <div>
+        <div class="app-name">CHW Companion</div>
+        <div class="app-sub">Triage Assistant</div>
+      </div>
+      <div class="status-badge" id="status-badge">
+        <div class="status-dot"></div>
+        <span id="status-text">LIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Always-visible safety disclaimer -->
+  <div class="safety-banner">
+    <strong>Decision support only — not a diagnosis.</strong>
+    Always use your clinical judgment. When uncertain, escalate urgency.
+  </div>
+
+  <!-- ── SCREEN 1: Assessment Form ── -->
+  <div class="screen active" id="form-screen">
+
+    <div class="card">
+      <div class="card-label">Patient Information</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Age</label>
+          <input type="text" id="patient-age" placeholder="e.g. 4y, 28y" />
+        </div>
+        <div class="field">
+          <label>Sex</label>
+          <select id="patient-sex">
+            <option value="unknown">—</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+      <div class="lang-row">
+        <span>🌍 Language:</span>
+        <select id="language">
+          <option>English</option>
+          <option>Français</option>
+          <option>Español</option>
+          <option>Português</option>
+          <option>Kiswahili</option>
+          <option>Hausa</option>
+          <option>العربية</option>
+          <option>हिन्दी</option>
+          <option>Amharic</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Chief Complaint</div>
+      <div class="quick-label">Quick select (tap to add):</div>
+      <div class="quick-chips">
+        <div class="chip" onclick="addChip(this, 'fever')">🌡 Fever</div>
+        <div class="chip" onclick="addChip(this, 'cough')">😮‍💨 Cough</div>
+        <div class="chip" onclick="addChip(this, 'diarrhoea')">💧 Diarrhoea</div>
+        <div class="chip" onclick="addChip(this, 'vomiting')">🤢 Vomiting</div>
+        <div class="chip" onclick="addChip(this, 'difficulty breathing')">🫁 Breathing difficulty</div>
+        <div class="chip" onclick="addChip(this, 'convulsions')">⚡ Convulsions</div>
+        <div class="chip" onclick="addChip(this, 'unconscious')">😶 Unconscious</div>
+        <div class="chip" onclick="addChip(this, 'severe pain')">😣 Severe pain</div>
+        <div class="chip" onclick="addChip(this, 'rash')">🔴 Rash</div>
+        <div class="chip" onclick="addChip(this, 'bleeding')">🩸 Bleeding</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Describe Symptoms</div>
+      <div class="symptom-area">
+        <textarea
+          class="symptom-textarea"
+          id="symptoms"
+          placeholder="Describe what you observe. Type in any language.&#10;&#10;Example: 5 year old girl with high fever for 2 days. Vomiting twice. Refuses to eat. Feels very hot to touch."
+          oninput="updateCount(this)"
+        ></textarea>
+        <div class="char-count"><span id="char-count">0</span> characters</div>
+      </div>
+    </div>
+
+    <button class="btn-triage" id="submit-btn" onclick="runTriage()">
+      🔍 Assess Patient
+    </button>
+
+  </div>
+
+  <!-- ── SCREEN 2: Loading ── -->
+  <div class="screen" id="loading-screen">
+    <div class="spinner-ring"></div>
+    <div class="loading-text">Assessing patient…</div>
+    <div class="loading-sub">Primary verdict in ~7 seconds, full detail streams in behind it</div>
+    <div class="loading-steps">
+      <div class="loading-step" id="step-1">
+        <div class="step-dot"></div>
+        Processing symptoms
+      </div>
+      <div class="loading-step" id="step-2">
+        <div class="step-dot"></div>
+        Ranking urgency (Gemma 4)
+      </div>
+      <div class="loading-step" id="step-3">
+        <div class="step-dot"></div>
+        Preparing clinical detail
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 3: Result ── -->
+  <div class="screen" id="result-screen">
+
+    <!-- Urgency Banner (primary) -->
+    <div class="urgency-banner pending" id="urgency-banner">
+      <div class="urgency-icon" id="urgency-icon">⏳</div>
+      <div>
+        <div class="urgency-level" id="urgency-level">Triaging…</div>
+        <div class="urgency-concern skeleton" id="urgency-concern">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      </div>
+    </div>
+
+    <!-- Recommended Action (primary) -->
+    <div class="action-card">
+      <div class="action-label">Recommended Action</div>
+      <div class="action-text" id="action-text">—</div>
+    </div>
+
+    <!-- Warning Signs (detail) -->
+    <div class="list-card" id="warning-card">
+      <div class="list-card-header">⚠️ Warning Signs to Watch</div>
+      <div class="body" id="warning-list">
+        <div class="detail-loading">
+          <span class="detail-loading-dot"></span>
+          <span class="detail-loading-dot"></span>
+          <span class="detail-loading-dot"></span>
+          <span>Preparing clinical detail…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Questions to Ask (detail) -->
+    <div class="list-card" id="questions-card">
+      <div class="list-card-header">❓ Ask the Patient / Caregiver</div>
+      <div class="body" id="questions-list">
+        <div class="detail-loading">
+          <span class="detail-loading-dot"></span>
+          <span class="detail-loading-dot"></span>
+          <span class="detail-loading-dot"></span>
+          <span>Preparing questions…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Do Not Do (detail) -->
+    <div class="list-card" id="donot-card" style="border-color: #f1948a;">
+      <div class="list-card-header" style="background:#fdecea; color:#922b21;">🚫 Do NOT Do</div>
+      <div class="body" id="donot-list">
+        <div class="detail-loading">
+          <span class="detail-loading-dot"></span>
+          <span class="detail-loading-dot"></span>
+          <span class="detail-loading-dot"></span>
+          <span>Preparing cautions…</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confidence -->
+    <div class="card">
+      <div class="confidence-row">
+        <span class="confidence-label">AI Confidence Level</span>
+        <span class="confidence-badge" id="confidence-badge">—</span>
+      </div>
+      <div class="disclaimer">
+        This AI supports your clinical judgment — it does not replace it.
+        Always follow your CHW protocols and refer when in doubt.
+      </div>
+    </div>
+
+    <div class="queue-action-row">
+      <button class="btn-secondary" onclick="newAssessment()">＋ New Patient</button>
+      <button class="btn-secondary" onclick="showQueue()">📋 Queue</button>
+    </div>
+
+  </div>
+
+  <!-- ── SCREEN 4: Priority Queue ── -->
+  <div class="screen" id="queue-screen">
+
+    <div id="queue-empty" class="queue-empty" style="display:none;">
+      <div class="empty-icon">📋</div>
+      <div>No patients triaged yet.</div>
+      <div style="margin-top:4px;font-size:12px;opacity:0.8;">Start a new assessment to build the queue.</div>
+    </div>
+
+    <div id="queue-emergency-section" style="display:none;">
+      <div class="queue-section-label">🚨 Emergency — refer immediately</div>
+      <div id="queue-emergency" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <div id="queue-urgent-section" style="display:none;">
+      <div class="queue-section-label">⚠️ Urgent — refer within hours</div>
+      <div id="queue-urgent" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <div id="queue-routine-section" style="display:none;">
+      <div class="queue-section-label">📋 Routine</div>
+      <div id="queue-routine" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <div id="queue-monitor-section" style="display:none;">
+      <div class="queue-section-label">✅ Monitor</div>
+      <div id="queue-monitor" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <div class="queue-action-row">
+      <button class="btn-secondary" onclick="newAssessment()">＋ New Patient</button>
+      <button class="btn-secondary danger" onclick="clearQueue()">🗑 Clear Queue</button>
+    </div>
+
+  </div>
+
+  <!-- Powered by -->
+  <div class="powered-by">
+    Powered by <span class="gemma-badge">Gemma 4</span> · Multilingual · 35+ languages
+  </div>
+
+</div>
+
+<!-- Bottom tab bar -->
+<nav class="tabbar">
+  <div class="tab active" id="tab-assess" onclick="newAssessment()">
+    <span class="tab-icon">🩺</span>
+    <span>Assess</span>
+  </div>
+  <div class="tab" id="tab-queue" onclick="showQueue()">
+    <span class="tab-icon">📋</span>
+    <span>Queue <span class="tab-count zero" id="tab-count">0</span></span>
+  </div>
+</nav>
+
+<script>
+  // ── Configuration ──────────────────────────────────────────────────────────
+  const API_BASE = (location.protocol === 'file:' ? 'http://localhost:5000' : '');
+  const QUEUE_KEY = 'chw_queue_v1';
+  const PRIMARY_TIMEOUT_MS = 20000;   // 7s expected, 20s hard cap
+  const DETAIL_TIMEOUT_MS  = 45000;   // 25s expected, 45s hard cap
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let selectedChips = [];
+  let currentTriage = null;       // { patient_age, patient_sex, symptoms, primary, detail }
+
+  // ── Symptom entry ──────────────────────────────────────────────────────────
+  function addChip(el, symptom) {
+    el.classList.toggle('selected');
+    if (el.classList.contains('selected')) selectedChips.push(symptom);
+    else selectedChips = selectedChips.filter(s => s !== symptom);
+    syncChipsToTextarea();
+  }
+
+  function syncChipsToTextarea() {
+    const ta = document.getElementById('symptoms');
+    const manual = ta.value.replace(/^[\w\s,]+\.\s*/, '').trim();
+    const chipText = selectedChips.length ? selectedChips.join(', ') + '. ' : '';
+    ta.value = chipText + manual;
+    updateCount(ta);
+  }
+
+  function updateCount(el) {
+    document.getElementById('char-count').textContent = el.value.length;
+  }
+
+  // ── Screen navigation ──────────────────────────────────────────────────────
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function setActiveTab(which) {
+    document.getElementById('tab-assess').classList.toggle('active', which === 'assess');
+    document.getElementById('tab-queue').classList.toggle('active', which === 'queue');
+  }
+
+  // ── Status badge (backend health) ──────────────────────────────────────────
+  async function updateStatusBadge() {
+    const badge = document.getElementById('status-badge');
+    const text = document.getElementById('status-text');
+    try {
+      const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2500) });
+      if (!res.ok) throw new Error('non-2xx');
+      const data = await res.json();
+      badge.classList.remove('offline');
+      text.textContent = data.mode === 'gemma4' ? 'LIVE · GEMMA 4' : 'LIVE · MOCK';
+    } catch {
+      badge.classList.add('offline');
+      text.textContent = 'OFFLINE (CACHED)';
+    }
+  }
+
+  // ── Triage (two-phase) ─────────────────────────────────────────────────────
+  async function runTriage() {
+    const symptoms = document.getElementById('symptoms').value.trim();
+    if (symptoms.length < 5) {
+      alert('Please describe the patient symptoms first.');
+      return;
+    }
+
+    const payload = {
+      symptoms,
+      patient_age: document.getElementById('patient-age').value || 'unknown',
+      patient_sex: document.getElementById('patient-sex').value || 'unknown',
+    };
+
+    currentTriage = { ...payload, primary: null, detail: null, ts: Date.now() };
+
+    showScreen('loading-screen');
+    setActiveTab('assess');
+    animateLoadingSteps();
+
+    // Kick off both calls in parallel; render primary the moment it lands,
+    // then update with detail when that comes back.
+    const primaryP = callEndpoint('/triage/primary', payload, PRIMARY_TIMEOUT_MS)
+      .catch(() => mockPrimary(payload.symptoms));
+
+    const detailP = callEndpoint('/triage/detail', payload, DETAIL_TIMEOUT_MS)
+      .catch(() => mockDetail(payload.symptoms));
+
+    primaryP.then(primary => {
+      currentTriage.primary = primary;
+      renderPrimary(primary);
+      showScreen('result-screen');
+    });
+
+    detailP.then(detail => {
+      currentTriage.detail = detail;
+      renderDetail(detail);
+      // Once we have both, commit to the queue
+      if (currentTriage.primary) saveToQueue(currentTriage);
+    });
+
+    // Belt-and-braces: if primary never lands, still save whatever we got
+    Promise.all([primaryP, detailP]).then(() => {
+      if (currentTriage.primary && currentTriage.detail && !currentTriage.saved) {
+        saveToQueue(currentTriage);
+      }
+    });
+  }
+
+  async function callEndpoint(path, payload, timeoutMs) {
+    const res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  function animateLoadingSteps() {
+    ['step-1','step-2','step-3'].forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('done');
+      }, 400 + i * 900);
+    });
+  }
+
+  // ── Mock fallbacks (used when backend unreachable) ─────────────────────────
+  function mockPrimary(symptoms) {
+    const s = (symptoms || '').toLowerCase();
+    if (s.includes('unconscious') || s.includes('not breathing') || s.includes('convuls')) {
+      return {
+        urgency: 'EMERGENCY', urgency_color: 'red',
+        recommended_action: 'Call for emergency transport NOW. Keep airway open. Do not leave patient alone. Stabilise and refer immediately to hospital.',
+        confidence: 'high',
+      };
+    }
+    if (s.includes('fever') || s.includes('malaria') || s.includes('vomit') || s.includes('diarrhoea') || s.includes('diarrhea')) {
+      return {
+        urgency: 'URGENT', urgency_color: 'orange',
+        recommended_action: 'Perform malaria RDT if available. Assess hydration (skin pinch, sunken eyes, drinking ability). Give ORS if dehydrated. Refer to clinic within 4 hours if RDT positive or moderate dehydration.',
+        confidence: 'medium',
+      };
+    }
+    if (s.includes('cough') || s.includes('breath') || s.includes('chest')) {
+      return {
+        urgency: 'URGENT', urgency_color: 'orange',
+        recommended_action: 'Count respiratory rate for 1 full minute. If fast breathing (>50 in <1yr, >40 in 1-5yr): refer to clinic today. Listen for chest indrawing. Give amoxicillin if available per protocol.',
+        confidence: 'medium',
+      };
+    }
+    if (s.includes('bleed') || s.includes('wound') || s.includes('cut') || s.includes('trauma')) {
+      return {
+        urgency: 'URGENT', urgency_color: 'orange',
+        recommended_action: 'Apply direct pressure. Assess blood loss. If severe or uncontrolled: refer immediately. Clean and dress minor wounds. Update tetanus if needed.',
+        confidence: 'high',
+      };
+    }
+    return {
+      urgency: 'ROUTINE', urgency_color: 'yellow',
+      recommended_action: 'Conduct full IMNCI assessment. Treat per standard CHW protocols. Educate caregiver on warning signs. Follow up in 2 days or sooner if condition worsens.',
+      confidence: 'medium',
+    };
+  }
+
+  function mockDetail(symptoms) {
+    const s = (symptoms || '').toLowerCase();
+    if (s.includes('unconscious') || s.includes('not breathing') || s.includes('convuls')) {
+      return {
+        primary_concern: 'Life-threatening emergency — immediate action required',
+        warning_signs: ['Loss of consciousness', 'Convulsions or fitting', 'Not breathing normally'],
+        questions_to_ask: ['Is patient breathing?', 'Duration of unconsciousness?', 'Any known conditions (epilepsy, diabetes)?'],
+        do_not_do: ['Do not leave patient unattended', 'Do not give food or water if unconscious', 'Do not restrain during convulsion'],
+      };
+    }
+    if (s.includes('fever') || s.includes('malaria') || s.includes('vomit') || s.includes('diarrhoea') || s.includes('diarrhea')) {
+      return {
+        primary_concern: 'Febrile illness with gastrointestinal symptoms — possible malaria or acute infection',
+        warning_signs: ['Unable to drink or breastfeed', 'Sunken eyes or dry mouth', 'Fever >38.5°C in child <5', 'Blood in stool'],
+        questions_to_ask: ['How long has fever been present?', 'How many times vomited today?', 'Is patient drinking fluids?', 'Any travel history in last 2 weeks?'],
+        do_not_do: ['Do not give aspirin to children under 12', 'Do not withhold ORS', 'Do not wait if danger signs appear'],
+      };
+    }
+    if (s.includes('cough') || s.includes('breath') || s.includes('chest')) {
+      return {
+        primary_concern: 'Respiratory illness — possible pneumonia',
+        warning_signs: ['Fast breathing', 'Chest indrawing (retractions)', 'Inability to drink', 'Cyanosis (blue lips/fingernails)', 'Grunting sounds'],
+        questions_to_ask: ['How long has cough been present?', 'Can you count breaths? How many per minute?', 'Any chest pain?', 'Fever with the cough?'],
+        do_not_do: ['Do not dismiss cough in children <5', 'Do not give cough suppressants to young children'],
+      };
+    }
+    if (s.includes('bleed') || s.includes('wound') || s.includes('cut') || s.includes('trauma')) {
+      return {
+        primary_concern: 'Trauma or haemorrhage — requires immediate wound assessment',
+        warning_signs: ['Uncontrolled or heavy bleeding', 'Signs of shock (pale, cold, rapid weak pulse)', 'Deep or contaminated wounds', 'Head injury with confusion'],
+        questions_to_ask: ['How did injury occur?', 'How much blood has been lost?', 'Is bleeding controlled?', 'Any head injury?'],
+        do_not_do: ['Do not remove embedded objects', 'Do not use tourniquet unless life-threatening haemorrhage', 'Do not apply contaminated materials to wound'],
+      };
+    }
+    return {
+      primary_concern: 'Non-emergency presentation — complete systematic assessment',
+      warning_signs: ['Worsening of any symptoms', 'New high fever', 'Unable to eat or drink', 'Unusual drowsiness'],
+      questions_to_ask: ['How long have symptoms been present?', 'Any other household members affected?', 'Current medications or treatments?', 'Any allergies?'],
+      do_not_do: ['Do not dismiss without full assessment', 'Do not forget to educate caregiver on warning signs'],
+    };
+  }
+
+  // ── Render (progressive) ───────────────────────────────────────────────────
+  function renderPrimary(p) {
+    const icons = { red: '🚨', orange: '⚠️', yellow: '📋', green: '✅' };
+    const color = p.urgency_color || 'yellow';
+    const banner = document.getElementById('urgency-banner');
+    banner.className = `urgency-banner ${color}`;
+    document.getElementById('urgency-icon').textContent = icons[color] || '📋';
+    document.getElementById('urgency-level').textContent = p.urgency || 'UNKNOWN';
+    // Primary doesn't include primary_concern — leave as skeleton until detail arrives
+    document.getElementById('action-text').textContent = p.recommended_action || '—';
+    const cb = document.getElementById('confidence-badge');
+    cb.className = `confidence-badge ${p.confidence || 'medium'}`;
+    cb.textContent = (p.confidence || 'medium').toUpperCase();
+  }
+
+  function renderDetail(d) {
+    // primary_concern updates the urgency banner
+    const concern = document.getElementById('urgency-concern');
+    concern.classList.remove('skeleton');
+    concern.innerHTML = '';
+    concern.textContent = d.primary_concern || '';
+
+    // Warning signs
+    const warnList = document.getElementById('warning-list');
+    warnList.innerHTML = (d.warning_signs || []).map(w =>
+      `<div class="list-item"><span class="list-icon">⚠</span><span>${escapeHtml(w)}</span></div>`
+    ).join('') || '<div class="detail-loading">No specific warning signs.</div>';
+
+    // Questions
+    const qList = document.getElementById('questions-list');
+    qList.innerHTML = (d.questions_to_ask || []).map(q =>
+      `<div class="list-item"><span class="list-icon">→</span><span>${escapeHtml(q)}</span></div>`
+    ).join('') || '<div class="detail-loading">No additional questions.</div>';
+
+    // Do not do
+    const doList = document.getElementById('donot-list');
+    const doNots = d.do_not_do || [];
+    document.getElementById('donot-card').style.display = doNots.length ? '' : 'none';
+    doList.innerHTML = doNots.map(x =>
+      `<div class="do-not-item"><span class="list-icon">✗</span><span>${escapeHtml(x)}</span></div>`
+    ).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+    }[c]));
+  }
+
+  // ── Priority queue (localStorage) ──────────────────────────────────────────
+  function loadQueue() {
+    try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
+    catch { return []; }
+  }
+
+  function saveQueue(q) {
+    localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
+    updateQueueBadge();
+  }
+
+  function saveToQueue(triage) {
+    if (!triage.primary || triage.saved) return;
+    const entry = {
+      id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      ts: triage.ts || Date.now(),
+      patient_age: triage.patient_age,
+      patient_sex: triage.patient_sex,
+      symptoms: triage.symptoms,
+      primary: triage.primary,
+      detail: triage.detail || null,
+    };
+    const q = loadQueue();
+    q.push(entry);
+    saveQueue(q);
+    triage.saved = true;
+  }
+
+  function clearQueue() {
+    if (!confirm('Clear all queued patients? This cannot be undone.')) return;
+    saveQueue([]);
+    renderQueue();
+  }
+
+  function updateQueueBadge() {
+    const q = loadQueue();
+    const badge = document.getElementById('tab-count');
+    badge.textContent = q.length;
+    badge.classList.toggle('zero', q.length === 0);
+  }
+
+  function formatTime(ts) {
+    const diff = Date.now() - ts;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return new Date(ts).toLocaleDateString();
+  }
+
+  function showQueue() {
+    renderQueue();
+    showScreen('queue-screen');
+    setActiveTab('queue');
+  }
+
+  function renderQueue() {
+    const q = loadQueue();
+    const empty = document.getElementById('queue-empty');
+    const buckets = { EMERGENCY: [], URGENT: [], ROUTINE: [], MONITOR: [] };
+    q.forEach(e => {
+      const u = (e.primary.urgency || 'ROUTINE').toUpperCase();
+      (buckets[u] || buckets.ROUTINE).push(e);
+    });
+    // Sort each bucket newest-first
+    Object.values(buckets).forEach(b => b.sort((a, b) => b.ts - a.ts));
+
+    const sections = [
+      ['EMERGENCY', 'queue-emergency-section', 'queue-emergency', 'red'],
+      ['URGENT',    'queue-urgent-section',    'queue-urgent',    'orange'],
+      ['ROUTINE',   'queue-routine-section',   'queue-routine',   'yellow'],
+      ['MONITOR',   'queue-monitor-section',   'queue-monitor',   'green'],
+    ];
+
+    let any = false;
+    sections.forEach(([key, sectionId, containerId, color]) => {
+      const items = buckets[key] || [];
+      const section = document.getElementById(sectionId);
+      const container = document.getElementById(containerId);
+      if (items.length) {
+        any = true;
+        section.style.display = '';
+        container.innerHTML = items.map(e => queueItemHtml(e, color)).join('');
+      } else {
+        section.style.display = 'none';
+        container.innerHTML = '';
+      }
+    });
+    empty.style.display = any ? 'none' : '';
+  }
+
+  function queueItemHtml(e, color) {
+    const icons = { red: '🚨', orange: '⚠️', yellow: '📋', green: '✅' };
+    const icon = icons[color] || '📋';
+    const urgency = (e.primary.urgency || '').toUpperCase();
+    const patient = `${e.patient_sex !== 'unknown' ? e.patient_sex : ''} age ${e.patient_age}`.trim() || 'Unknown patient';
+    const symptom = (e.symptoms || '').slice(0, 70);
+    const time = formatTime(e.ts);
+    return `
+      <div class="queue-item ${color}" onclick="reopenTriage('${e.id}')">
+        <div class="queue-icon">${icon}</div>
+        <div class="queue-main">
+          <div class="queue-top-line">
+            <span class="queue-patient">${escapeHtml(patient)}</span>
+            <span class="queue-urgency ${color}">${escapeHtml(urgency)}</span>
+          </div>
+          <div class="queue-symptom">${escapeHtml(symptom)}</div>
+        </div>
+        <div class="queue-time">${escapeHtml(time)}</div>
+      </div>`;
+  }
+
+  function reopenTriage(id) {
+    const entry = loadQueue().find(e => e.id === id);
+    if (!entry) return;
+    currentTriage = { ...entry };
+    renderPrimary(entry.primary);
+    if (entry.detail) renderDetail(entry.detail);
+    showScreen('result-screen');
+  }
+
+  // ── New assessment ─────────────────────────────────────────────────────────
+  function newAssessment() {
+    document.getElementById('symptoms').value = '';
+    document.getElementById('patient-age').value = '';
+    document.getElementById('patient-sex').value = 'unknown';
+    document.getElementById('char-count').textContent = '0';
+    selectedChips = [];
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    ['step-1','step-2','step-3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('done');
+    });
+    // Reset result screen placeholders for next run
+    const banner = document.getElementById('urgency-banner');
+    banner.className = 'urgency-banner pending';
+    document.getElementById('urgency-icon').textContent = '⏳';
+    document.getElementById('urgency-level').textContent = 'Triaging…';
+    const concern = document.getElementById('urgency-concern');
+    concern.className = 'urgency-concern skeleton';
+    concern.innerHTML = '&nbsp;'.repeat(18);
+    document.getElementById('action-text').textContent = '—';
+    ['warning-list', 'questions-list', 'donot-list'].forEach(id => {
+      document.getElementById(id).innerHTML =
+        '<div class="detail-loading"><span class="detail-loading-dot"></span><span class="detail-loading-dot"></span><span class="detail-loading-dot"></span><span>Preparing clinical detail…</span></div>';
+    });
+    document.getElementById('donot-card').style.display = '';
+
+    showScreen('form-screen');
+    setActiveTab('assess');
+  }
+
+  // ── Boot ────────────────────────────────────────────────────────────────────
+  updateQueueBadge();
+  updateStatusBadge();
+  setInterval(updateStatusBadge, 30000);
+</script>
+
+</body>
+</html>
