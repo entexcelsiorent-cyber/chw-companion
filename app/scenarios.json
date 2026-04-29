@@ -1,167 +1,751 @@
 {
   "version": "1",
-  "generated_at": "2026-04-27",
+  "generated_at": "2026-04-28T17:06:09Z",
   "model_id": "google/gemma-3-1b-it",
   "scenarios": [
     {
       "id": "malaria-pediatric-fever",
       "title_en": "Pediatric high fever in malaria zone",
       "user_prompt": "Patient: female, age 4. Symptoms: fever 39.5C for 2 days, vomiting twice today, refuses to drink water. Lives in malaria-endemic area, no bednet used.",
-      "trigger_keywords": ["fever", "vomiting", "malaria"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "fever",
+        "vomiting",
+        "malaria"
+      ],
+      "primary_response": {
+        "urgency": "URGENT",
+        "urgency_color": "orange",
+        "recommended_action": "Refer to nearest health facility today for malaria testing and assessment of dehydration. Encourage small frequent sips of ORS while traveling.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Potential for dehydration and complications due to fever and vomiting.",
+        "warning_signs": [
+          "Refusal to drink water",
+          "High fever (39.5C)",
+          "Frequent vomiting",
+          "Signs of dehydration (dry mouth, decreased urine output)"
+        ],
+        "questions_to_ask": [
+          "Can you describe the nature of your vomiting?",
+          "How often are you vomiting?",
+          "Do you have any other symptoms, such as diarrhea, abdominal pain, or headache?",
+          "Are you experiencing any chills or sweats?"
+        ],
+        "do_not_do": [
+          "Assess for signs of shock (pale skin, rapid pulse, low blood pressure)"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "malaria-infant-convulsion",
       "title_en": "Infant convulsion with fever — cerebral malaria risk",
       "user_prompt": "Patient: male, age 8 months. Symptoms: sudden convulsions lasting about 3 minutes, high fever 40C, eyes rolling back, unresponsive after seizure. Mother says he had fever since yesterday.",
-      "trigger_keywords": ["convulsion", "infant", "seizure"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "convulsion",
+        "infant",
+        "seizure"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately to nearest health facility. Give pre-referral rectal artesunate if available. Keep airway clear and monitor breathing en route.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Sudden seizures in a young infant with high fever and unresponsive behavior.",
+        "warning_signs": [
+          "High fever (40C)",
+          "Eye rolling backward",
+          "Unresponsive after seizure",
+          "Recent fever in mother"
+        ],
+        "questions_to_ask": [
+          "Can you describe the convulsions in more detail? (e.g., what did he look like, how did he move)",
+          "How long have you been monitoring his temperature?",
+          "Can you confirm the mother's statement about the fever?",
+          "Has he been eating or drinking anything?"
+        ],
+        "do_not_do": [
+          "Attempt to diagnose the cause of the seizures.",
+          "Assume the seizure is a simple episode.",
+          "Dismiss the mother's concerns without further investigation."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "pneumonia-child-fast-breathing",
       "title_en": "Child with fast breathing and chest indrawing",
       "user_prompt": "Patient: male, age 2 years. Symptoms: cough for 4 days, breathing very fast, chest pulling in when breathing, fever 38.8C, won't eat. Respiratory rate counted at 55 breaths per minute.",
-      "trigger_keywords": ["cough", "breathing", "chest"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "cough",
+        "breathing",
+        "chest"
+      ],
+      "primary_response": {
+        "urgency": "URGENT",
+        "urgency_color": "orange",
+        "recommended_action": "Refer to health facility today for suspected pneumonia. Give first dose of amoxicillin if available per CHW protocol.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Possible respiratory infection with concerning symptoms.",
+        "warning_signs": [
+          "Rapid breathing",
+          "Chest tightness/pulling",
+          "Fever (38.8°C)",
+          "Refusal to eat"
+        ],
+        "questions_to_ask": [
+          "Can you describe the nature of the cough? (e.g., dry, productive)",
+          "Have you had any other symptoms like sore throat, runny nose, or body aches?",
+          "Are you experiencing any difficulty breathing?",
+          "Have you been exposed to anyone who is sick?"
+        ],
+        "do_not_do": [
+          "Prescribe medication without a proper diagnosis.",
+          "Dismiss the patient's concerns.",
+          "Assume the patient is experiencing a minor illness."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "pneumonia-elderly-confusion",
       "title_en": "Elderly pneumonia with altered mental status",
       "user_prompt": "Patient: female, age 72. Symptoms: cough with green-yellow mucus for 6 days, fever 38.2C, now confused and difficult to wake, breathing rapidly. Family says she was fine last week.",
-      "trigger_keywords": ["elderly", "confusion", "cough"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "elderly",
+        "confusion",
+        "cough"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately to nearest health facility. Altered mental status with respiratory symptoms in an elderly patient may indicate severe pneumonia or sepsis.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Possible respiratory infection with potential worsening symptoms.",
+        "warning_signs": [
+          "Confusion",
+          "Difficulty waking",
+          "Rapid breathing",
+          "Green-yellow mucus"
+        ],
+        "questions_to_ask": [
+          "Can you describe the color of the mucus?",
+          "Have you noticed any other symptoms like sore throat, headache, or body aches?",
+          "Can you tell me about your recent activities and any changes in your routine?",
+          "Do you have any known allergies or medical conditions?"
+        ],
+        "do_not_do": [
+          "Prescribe medication without a proper diagnosis.",
+          "Dismiss her confusion as simply being tired.",
+          "Assume she is not in immediate danger."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "diarrhoea-severe-dehydration-infant",
       "title_en": "Infant severe dehydration from acute diarrhoea",
       "user_prompt": "Patient: female, age 10 months. Symptoms: watery diarrhoea more than 8 times today, vomited 3 times, sunken eyes, skin pinch goes back very slowly, no tears when crying, lethargic. Last wet nappy was 6 hours ago.",
-      "trigger_keywords": ["diarrhoea", "dehydration", "infant"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "diarrhoea",
+        "dehydration",
+        "infant"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately to nearest health facility. Begin ORS or IV rehydration en route if trained. Severe dehydration is life-threatening in infants.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Potential dehydration and gastrointestinal distress.",
+        "warning_signs": [
+          "Watery diarrhoea",
+          "Vomited 3 times",
+          "Sunken eyes",
+          "Skin pinch goes back very slowly",
+          "No tears when crying"
+        ],
+        "questions_to_ask": [
+          "Can you describe the consistency of your diarrhoea?",
+          "How often are you experiencing diarrhoea?",
+          "Have you noticed any vomiting?",
+          "Are you experiencing any pain or discomfort while passing stool?",
+          "Is your skin looking dry and pale?"
+        ],
+        "do_not_do": [
+          "Assess for signs of severe dehydration (e.g., decreased skin turgor, rapid heart rate)"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "diarrhoea-mild-child",
       "title_en": "Child mild diarrhoea, drinking well",
       "user_prompt": "Patient: male, age 3 years. Symptoms: loose stool 3 times today, no blood, drinking ORS when offered, mild stomach cramps. Still playful. No fever. Mother prepared ORS correctly.",
-      "trigger_keywords": ["diarrhoea", "loose stool", "child"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "diarrhoea",
+        "loose stool",
+        "child"
+      ],
+      "primary_response": {
+        "urgency": "MONITOR",
+        "urgency_color": "green",
+        "recommended_action": "Continue ORS at home and monitor. Return immediately if vomiting starts, diarrhoea worsens, fever develops, or child becomes lethargic.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Loose stool and potential dehydration",
+        "warning_signs": [
+          "Loose stool three times in a short period",
+          "No blood in stool",
+          "Failure to drink ORS as prescribed",
+          "Mild stomach cramps"
+        ],
+        "questions_to_ask": [
+          "Can you describe the consistency of the stool?",
+          "How often are you drinking ORS?",
+          "Are you experiencing any other symptoms, such as nausea or vomiting?",
+          "How long have you been feeling playful?"
+        ],
+        "do_not_do": [
+          "Assess for signs of severe dehydration (e.g., decreased urination, dry mouth)"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "malnutrition-severe-wasting",
       "title_en": "Severe acute malnutrition with bilateral oedema",
       "user_prompt": "Patient: male, age 18 months. MUAC measured at 10.2 cm. Both feet have pitting oedema. Child is very weak, barely responds, has dry peeling skin. Mother says he stopped eating 2 weeks ago. No recent illness reported.",
-      "trigger_keywords": ["malnutrition", "oedema", "muac"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "malnutrition",
+        "oedema",
+        "muac"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately to nearest stabilisation centre. Severe acute malnutrition with bilateral oedema requires inpatient care.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Significant developmental delay and malnutrition.",
+        "warning_signs": [
+          "MUAC at 10.2 cm – low weight and height suggests potential malnutrition.",
+          "Pitting oedema in both feet – indicates fluid retention and potential neurological issues.",
+          "Child’s weakness and lack of responsiveness – raises concern for neurological impairment.",
+          "Dry peeling skin – could be indicative of dehydration or underlying medical condition."
+        ],
+        "questions_to_ask": [
+          "Can you describe the child’s feeding history? When did he stop eating?",
+          "Are there any other symptoms you’ve noticed, such as lethargy, difficulty breathing, or changes in bowel movements?",
+          "Are there any family history of developmental delays or medical conditions?",
+          "Can you describe the child’s overall appearance – is he showing signs of distress or discomfort?"
+        ],
+        "do_not_do": [
+          "Assess for signs of infection – while dry peeling skin is a concern, further investigation is needed.",
+          "Perform a thorough physical examination – focus on neurological assessment and fluid assessment.",
+          "Attempt to determine the cause of the recent cessation of feeding – this may require further questioning."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "malnutrition-moderate-monitor",
       "title_en": "Moderate acute malnutrition, stable, for follow-up",
       "user_prompt": "Patient: female, age 2 years. MUAC 11.8 cm, no oedema, eating small amounts when encouraged, no acute illness. Mother reports child has been thin for 3 months. Weight-for-height Z-score estimated at minus 2.",
-      "trigger_keywords": ["malnutrition", "muac", "thin"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "malnutrition",
+        "muac",
+        "thin"
+      ],
+      "primary_response": {
+        "urgency": "MONITOR",
+        "urgency_color": "green",
+        "recommended_action": "Enrol in supplementary feeding programme. Weekly MUAC and weight monitoring. Counsel mother on age-appropriate feeding.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Child’s growth and nutritional status",
+        "warning_signs": [
+          "Low weight-for-height Z-score (minus 2)",
+          "Thinness for 3 months",
+          "Small appetite",
+          "Possible malnutrition"
+        ],
+        "questions_to_ask": [
+          "Can you describe the child’s eating habits?",
+          "Have you noticed any changes in the child’s weight or height?",
+          "Are there any other symptoms, such as lethargy or irritability?",
+          "What is the mother’s assessment of the child’s overall health?"
+        ],
+        "do_not_do": [
+          "Order blood tests immediately (unless specifically instructed by a physician)",
+          "Assess for signs of severe illness",
+          "Assume the child is experiencing a serious medical condition"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "obstetric-postpartum-haemorrhage",
       "title_en": "Postpartum haemorrhage after home delivery",
       "user_prompt": "Patient: female, age 26, delivered at home 2 hours ago. Symptoms: heavy bleeding that has soaked through 3 cloths, feeling dizzy and weak, heart beating fast, skin pale and cold. Baby delivered normally but placenta not yet passed.",
-      "trigger_keywords": ["postpartum", "bleeding", "delivery"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "postpartum",
+        "bleeding",
+        "delivery"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately. Massage uterus firmly through abdominal wall, give oxytocin or misoprostol if trained, keep mother warm and monitor pulse.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Heavy bleeding, potential postpartum complications, and maternal distress.",
+        "warning_signs": [
+          "Rapid heart rate",
+          "Pale skin",
+          "Significant bleeding",
+          "Dizziness"
+        ],
+        "questions_to_ask": [
+          "Can you describe the amount of bleeding?",
+          "Have you experienced any pain during delivery?",
+          "Are you feeling dizzy or lightheaded?",
+          "Do you have any nausea or vomiting?"
+        ],
+        "do_not_do": [
+          "Assess for signs of postpartum hemorrhage (e.g., uterine contractions)"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "obstetric-eclampsia-pregnant",
       "title_en": "Pregnant woman with headache, high BP, and fits",
       "user_prompt": "Patient: female, age 22, 8 months pregnant. Symptoms: severe headache since this morning, blurry vision, swollen face and hands, then sudden convulsion lasting 2 minutes. She is 34 weeks by last menstrual period.",
-      "trigger_keywords": ["pregnant", "convulsion", "headache"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "pregnant",
+        "convulsion",
+        "headache"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately. Suspected eclampsia. Give pre-referral magnesium sulfate IM if trained and available. Position on left side, protect from injury.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Severe pregnancy symptoms, potential for complications.",
+        "warning_signs": [
+          "Severe headache",
+          "Blurry vision",
+          "Swollen face and hands",
+          "Sudden convulsion lasting 2 minutes"
+        ],
+        "questions_to_ask": [
+          "Can you describe the headache in more detail? (e.g., throbbing, sharp, pressure)",
+          "How long have you been experiencing the blurry vision?",
+          "Are there any other symptoms you're experiencing besides the headache, vision, and swelling?",
+          "Have you taken any medication for the headache or other symptoms?"
+        ],
+        "do_not_do": [
+          "Prescribe medication without a proper diagnosis.",
+          "Recommend immediate hospitalization without further evaluation."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "snakebite-adult-limb",
       "title_en": "Adult snakebite with fang marks, limb swelling",
       "user_prompt": "Patient: male, age 35. Bitten on right foot by a snake in the field 45 minutes ago. Two fang marks visible, foot and ankle swelling rapidly, severe local pain. Patient feels nauseous. Snake not identified but described as brown and large.",
-      "trigger_keywords": ["snakebite", "snake", "swelling"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "snakebite",
+        "snake",
+        "swelling"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately for antivenom assessment. Immobilise the limb at heart level, remove tight items, do not cut or suck the wound.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Severe wound and potential infection.",
+        "warning_signs": [
+          "Rapid foot and ankle swelling",
+          "Severe local pain",
+          "Nausea",
+          "Unidentified snake bite (potential for venomous bite)"
+        ],
+        "questions_to_ask": [
+          "Can you describe the snake's color?",
+          "Can you estimate the size of the snake?",
+          "Can you pinpoint the location of the fang marks?",
+          "How long ago did the bite occur?",
+          "Are you experiencing any other symptoms, such as dizziness or difficulty breathing?"
+        ],
+        "do_not_do": [
+          "Attempt to capture or handle the snake",
+          "Administer any medications without a physician's order",
+          "Provide definitive snake identification without expert consultation"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "meningitis-child-classic",
       "title_en": "Child with stiff neck, photophobia, and fever",
       "user_prompt": "Patient: male, age 7. Symptoms: fever 39.8C, very stiff neck, cries when bright light is shone in eyes, severe headache, vomited twice. Symptoms developed suddenly over 12 hours. No recent travel. Not vaccinated against meningitis.",
-      "trigger_keywords": ["stiff neck", "fever", "headache"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "stiff neck",
+        "fever",
+        "headache"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately. Classic meningitis triad in an unvaccinated child requires urgent antibiotics and lumbar puncture.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Possible Meningitis",
+        "warning_signs": [
+          "Stiff neck",
+          "Crying when exposed to bright light",
+          "Severe headache",
+          "Vomiting"
+        ],
+        "questions_to_ask": [
+          "Can you describe the nature of the headache?",
+          "Have you experienced any recent changes in your health?",
+          "Are you taking any medications?",
+          "Do you have any allergies?"
+        ],
+        "do_not_do": [
+          "Prescribe medication without a proper diagnosis.",
+          "Recommend vaccination against meningitis.",
+          "Assess for signs of dehydration."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "trauma-road-accident-unconscious",
       "title_en": "Road accident victim, head injury, unconscious",
       "user_prompt": "Patient: male, age 19. Involved in motorcycle accident 20 minutes ago. Not wearing helmet. Currently unconscious, bleeding from head wound, breathing irregularly, does not respond to voice. Bystanders say he was conscious briefly right after crash.",
-      "trigger_keywords": ["unconscious", "head injury", "accident"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "unconscious",
+        "head injury",
+        "accident"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Refer immediately with cervical spine precautions. Maintain airway, control external bleeding with direct pressure, do not move the neck.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Severe head injury, potential for life-threatening complications.",
+        "warning_signs": [
+          "Unconsciousness",
+          "Bleeding from head wound",
+          "Irregular breathing",
+          "Lack of responsiveness"
+        ],
+        "questions_to_ask": [
+          "Can you tell me about the motorcycle accident?",
+          "What happened immediately before the crash?",
+          "Do you recall any specific events leading up to the crash?",
+          "Are you experiencing any pain?"
+        ],
+        "do_not_do": [
+          "Attempt to move the patient",
+          "Provide first aid without proper training",
+          "Assume the patient is stable",
+          "Assess for signs of shock"
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "trauma-wound-adult-routine",
       "title_en": "Clean laceration from farm tool, low risk",
       "user_prompt": "Patient: female, age 34. Cut her forearm on a hoe blade while working 3 hours ago. Wound is about 4 cm long, bled initially but now stopped with cloth pressure. Wound edges are clean. Patient is alert, no fever, tetanus vaccination status unknown.",
-      "trigger_keywords": ["wound", "laceration", "cut"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "wound",
+        "laceration",
+        "cut"
+      ],
+      "primary_response": {
+        "urgency": "ROUTINE",
+        "urgency_color": "yellow",
+        "recommended_action": "Clean wound with safe water and soap, apply pressure dressing, refer for tetanus vaccination today and wound review.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Wound management and potential infection.",
+        "warning_signs": [
+          "Bleeding cessation despite pressure",
+          "Wound appearance suggests possible infection",
+          "Lack of tetanus vaccination status",
+          "Delayed wound healing"
+        ],
+        "questions_to_ask": [
+          "Can you describe the pain level?",
+          "Have you noticed any redness or swelling around the wound?",
+          "Have you been exposed to any chemicals or materials that could irritate the skin?",
+          "Do you have any allergies to medications or materials?"
+        ],
+        "do_not_do": [
+          "Prescribe antibiotics without a culture.",
+          "Recommend a specific bandage type without assessment.",
+          "Assume the wound is minor and require no further attention.",
+          "Dismiss the patient's concerns about the wound."
+        ],
+        "language_detected": "English"
+      }
     },
     {
       "id": "swahili-homa-mtoto",
       "title_en": "Swahili: child fever and vomiting (Kiswahili prompt)",
       "user_prompt": "Mgonjwa: mtoto wa kike, miaka 3. Dalili: homa kali, joto la mwili 39C kwa siku moja, kutapika mara mbili, anakataa kunywa. Anaishi karibu na bwawa la maji. Mama anasema mtoto analala sana na hana nguvu.",
-      "trigger_keywords": ["homa", "kutapika", "mtoto"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "homa",
+        "kutapika",
+        "mtoto"
+      ],
+      "primary_response": {
+        "urgency": "URGENT",
+        "urgency_color": "orange",
+        "recommended_action": "Mpeleke mtoto kwenye kituo cha afya leo kwa uchunguzi wa malaria na maji. Mpe ORS njiani na endelea kunyonyesha au kunywesha maji.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Child health issues - severe malnutrition, dehydration, and potential complications",
+        "warning_signs": [
+          "Severe dehydration",
+          "High fever (39C)",
+          "Failure to thrive (not gaining weight)",
+          "Difficulty swallowing"
+        ],
+        "questions_to_ask": [
+          "Can you describe the child's appetite and how they are eating?",
+          "How often is the child drinking?",
+          "Are there any other symptoms, such as vomiting or diarrhea?",
+          "What is the child's skin like? Is it dry or moist?"
+        ],
+        "do_not_do": [
+          "Assume the child is simply experiencing a cold.",
+          "Dismiss the child's symptoms without further investigation.",
+          "Focus solely on the temperature without considering other potential causes."
+        ],
+        "language_detected": "Swahili"
+      }
     },
     {
       "id": "swahili-ngono-ujauzito",
       "title_en": "Swahili: pregnant woman, abdominal pain (Kiswahili prompt)",
       "user_prompt": "Mgonjwa: mwanamke, umri miaka 30, mjamzito miezi 7. Dalili: maumivu makali ya tumbo yanayoanza na kuacha, damu kidogo ukeni, kichwa kinauma. Mtoto hajahisi kucheza tangu asubuhi.",
-      "trigger_keywords": ["mjamzito", "maumivu", "damu"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "mjamzito",
+        "maumivu",
+        "damu"
+      ],
+      "primary_response": {
+        "urgency": "EMERGENCY",
+        "urgency_color": "red",
+        "recommended_action": "Mpeleke mama mara moja kwenye hospitali. Damu ukeni na maumivu ya tumbo katika ujauzito wa miezi 7 ni dharura ya uzazi.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Cardiovascular issues (possible heart problems)",
+        "warning_signs": [
+          "Sudden onset of chest pain",
+          "Rapid heartbeat",
+          "Dizziness or lightheadedness",
+          "Changes in appetite"
+        ],
+        "questions_to_ask": [
+          "Can you describe the nature of the maumivu makali ya tumbo? (Describe the onset of stomach pain)",
+          "How long have you been experiencing the reduced heart rate?",
+          "Does the maumivu makali ya tumbo occur at any specific time of day?",
+          "Have you noticed any changes in your appetite or weight?"
+        ],
+        "do_not_do": [
+          "Ask about potential drug use",
+          "Press for detailed medical history beyond the provided information",
+          "Assume the patient is experiencing a mental health crisis"
+        ],
+        "language_detected": "Swahili"
+      }
     },
     {
       "id": "french-paludisme-enfant",
       "title_en": "French: child malaria symptoms (French prompt)",
       "user_prompt": "Patient : garçon, 5 ans. Symptômes : fièvre à 39,8°C depuis deux jours, frissons, vomissements à trois reprises, refuse de boire. Vit dans une zone de paludisme. Test rapide non disponible au village. L'enfant est fatigué et pleure beaucoup.",
-      "trigger_keywords": ["fièvre", "paludisme", "vomissements"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "fièvre",
+        "paludisme",
+        "vomissements"
+      ],
+      "primary_response": {
+        "urgency": "URGENT",
+        "urgency_color": "orange",
+        "recommended_action": "Référer aujourd'hui au centre de santé pour test de paludisme et évaluation de la déshydratation. Encourager des petites gorgées de SRO en route.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Possible malaria infection in a 5-year-old child with fever, vomiting, and refusal to drink.",
+        "warning_signs": [
+          "Fever (39.8°C)",
+          "Vomiting (three times)",
+          "Fatigue",
+          "Refusal to drink"
+        ],
+        "questions_to_ask": [
+          "Could you describe the vomiting? What does it look like?",
+          "How often are the vomiting occurring?",
+          "What is the child's appetite like? Is he/she eating at all?",
+          "Are there any other symptoms besides the fever and vomiting (e.g., rash, diarrhea, abdominal pain)?"
+        ],
+        "do_not_do": [
+          "Attempt to administer medication without a proper diagnosis.",
+          "Assume the child has a simple illness.",
+          "Dismiss the child's symptoms without further investigation."
+        ],
+        "language_detected": "French"
+      }
     },
     {
       "id": "french-diarrhee-adulte",
       "title_en": "French: adult diarrhoea, moderate dehydration (French prompt)",
       "user_prompt": "Patient : homme, 42 ans. Symptômes : diarrhée liquide depuis hier soir, huit selles dans la nuit, légèrement étourdi, lèvres sèches, boit encore un peu d'eau. Pas de sang dans les selles. Pas de fièvre. Travaille aux champs sous forte chaleur.",
-      "trigger_keywords": ["diarrhée", "déshydratation", "étourdi"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "diarrhée",
+        "déshydratation",
+        "étourdi"
+      ],
+      "primary_response": {
+        "urgency": "URGENT",
+        "urgency_color": "orange",
+        "recommended_action": "Référer aujourd'hui pour évaluation de la déshydratation. Boire des SRO ou de l'eau salée-sucrée régulièrement. Éviter le travail au soleil.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Diarrhea with recent onset, dehydration, and potential electrolyte imbalance.",
+        "warning_signs": [
+          "Recent onset of diarrhea (8 selles in 24 hours)",
+          "Dehydration (appearing slightly etouffé)",
+          "Lethargy (lightheadedness)",
+          "Dry lips"
+        ],
+        "questions_to_ask": [
+          "Can you describe the consistency of your stool?",
+          "How often are you experiencing bowel movements?",
+          "Are you drinking fluids regularly?",
+          "Have you noticed any changes in your urine color?"
+        ],
+        "do_not_do": [
+          "Prescribe medication (yet)",
+          "Perform a physical examination",
+          "Assess for signs of severe dehydration",
+          "Assess for any signs of infection"
+        ],
+        "language_detected": "French"
+      }
     },
     {
       "id": "hausa-zazzabi-jariiri",
       "title_en": "Hausa: infant fever and refusal to feed (Hausa prompt)",
       "user_prompt": "Majiyyaci: yaro, watanni 6. Alamomi: zazzabi mai tsanani, kin sha nono, kuka ba ya tsayawa, jiki na zafi sosai. Uwa ta ce yaro bai yi barci dare baki dayan ba. Ana zaune kusa da ruwa mai tsayawa.",
-      "trigger_keywords": ["zazzabi", "jariiri", "zafi"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "zazzabi",
+        "jariiri",
+        "zafi"
+      ],
+      "primary_response": {
+        "urgency": "URGENT",
+        "urgency_color": "orange",
+        "recommended_action": "Kai jariri zuwa cibiyar lafiya yau don gwajin zazzabin cizon sauro. Ci gaba da shayar da nono kuma ka kiyaye yaron daga sauro.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Possible health crisis – child with unexplained illness, potential for worsening condition.",
+        "warning_signs": [
+          "Rapid breathing",
+          "Pale skin",
+          "Weakness",
+          "Loss of appetite"
+        ],
+        "questions_to_ask": [
+          "Can you describe the child's symptoms in more detail?",
+          "Has the child been exposed to any potential illnesses?",
+          "Are there any recent travel history?",
+          "Is the child currently receiving any medication?"
+        ],
+        "do_not_do": [
+          "Dismiss the child's concerns",
+          "Assume the child is fine",
+          "Provide medical advice without proper assessment"
+        ],
+        "language_detected": "Hausa"
+      }
     },
     {
       "id": "malaria-adult-uncomplicated-monitor",
       "title_en": "Adult uncomplicated malaria, RDT positive, treated",
       "user_prompt": "Patient: male, age 28. RDT positive for malaria. Fever 38.4C, mild headache and body aches, eating small amounts, drinking water. Started artemisinin-based treatment yesterday per CHW protocol. No danger signs present. Asks if he can continue working.",
-      "trigger_keywords": ["malaria", "rdt", "treatment"],
-      "primary_response": null,
-      "detail_response": null
+      "trigger_keywords": [
+        "malaria",
+        "rdt",
+        "treatment"
+      ],
+      "primary_response": {
+        "urgency": "ROUTINE",
+        "urgency_color": "yellow",
+        "recommended_action": "Complete the artemisinin-based course as prescribed. Rest at home for 48 hours, drink fluids. Return immediately if fever rises, confusion, or vomiting starts.",
+        "confidence": "high"
+      },
+      "detail_response": {
+        "primary_concern": "Malaria infection and potential complications",
+        "warning_signs": [
+          "Fever of 38.4C",
+          "Mild headache and body aches",
+          "Decreased appetite",
+          "Fluid intake (drinking water)"
+        ],
+        "questions_to_ask": [
+          "Can you continue working?",
+          "Are you experiencing any discomfort or worsening of symptoms?",
+          "Have you taken your artemisinin-based treatment as prescribed?",
+          "Do you have any allergies to medications?"
+        ],
+        "do_not_do": [
+          "Initiate further testing without a clear diagnosis.",
+          "Provide medical advice beyond standard CHW protocols.",
+          "Assess for signs of dehydration."
+        ],
+        "language_detected": "English"
+      }
     }
-  ]
+  ],
+  "gen_meta": {
+    "gpu": "Tesla P100-PCIE-16GB",
+    "transformers": "5.6.2",
+    "total_seconds": 1229.5
+  },
+  "curated_at": "2026-04-29",
+  "curation_note": "primary_response and language_detected manually curated after model outputs collapsed all severities to URGENT/red. detail_response content (warning_signs, questions_to_ask, do_not_do, primary_concern) preserved as generated."
 }
