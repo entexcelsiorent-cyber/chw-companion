@@ -860,6 +860,16 @@
     </div>
 
     <div class="card">
+      <div class="card-label">Sample Patients (Demo)</div>
+      <div class="quick-label">Tap to load a canonical case:</div>
+      <div class="quick-chips">
+        <div class="chip" onclick="loadSample('malaria-pediatric-fever')">🧒 Malaria · child</div>
+        <div class="chip" onclick="loadSample('snakebite-adult-limb')">🐍 Snake bite · adult</div>
+        <div class="chip" onclick="loadSample('swahili-homa-mtoto')">🇰🇪 Mtoto · Swahili</div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-label">Chief Complaint</div>
       <div class="quick-label">Quick select (tap to add):</div>
       <div class="quick-chips">
@@ -1067,6 +1077,30 @@
   let currentTriage = null;       // { patient_age, patient_sex, symptoms, primary, detail }
 
   // ── Symptom entry ──────────────────────────────────────────────────────────
+  // Load a canonical scenario into the form (demo helper). Looks up the
+  // scenario by id in the cached scenarios, stuffs user_prompt into the
+  // textarea, and scrolls it into view. Does NOT auto-submit — the demo
+  // presenter clicks "Assess Patient" themselves.
+  function loadSample(scenarioId) {
+    const find = () => (CACHED_SCENARIOS || []).find(s => s.id === scenarioId);
+    const apply = sc => {
+      const ta = document.getElementById('symptoms');
+      ta.value = sc.user_prompt;
+      selectedChips = [];
+      document.querySelectorAll('.chip.selected').forEach(c => c.classList.remove('selected'));
+      updateCount(ta);
+      ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    const sc = find();
+    if (sc) return apply(sc);
+    // Cache may still be loading on first paint
+    loadCachedScenarios().then(() => {
+      const sc2 = find();
+      if (sc2) apply(sc2);
+      else console.warn('[sample] scenario not found:', scenarioId);
+    });
+  }
+
   function addChip(el, symptom) {
     el.classList.toggle('selected');
     if (el.classList.contains('selected')) selectedChips.push(symptom);
