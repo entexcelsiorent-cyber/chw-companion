@@ -44,7 +44,7 @@
       "user_prompt": "Patient: male, age 8 months. Symptoms: sudden convulsions lasting about 3 minutes, high fever 40C, eyes rolling back, unresponsive after seizure. Mother says he had fever since yesterday.",
       "trigger_keywords": [
         "convulsion",
-        "infant",
+        "fever",
         "seizure"
       ],
       "primary_response": {
@@ -117,9 +117,9 @@
       "title_en": "Elderly pneumonia with altered mental status",
       "user_prompt": "Patient: female, age 72. Symptoms: cough with green-yellow mucus for 6 days, fever 38.2C, now confused and difficult to wake, breathing rapidly. Family says she was fine last week.",
       "trigger_keywords": [
-        "elderly",
-        "confusion",
-        "cough"
+        "confused",
+        "cough",
+        "wake"
       ],
       "primary_response": {
         "urgency": "EMERGENCY",
@@ -154,9 +154,9 @@
       "title_en": "Infant severe dehydration from acute diarrhoea",
       "user_prompt": "Patient: female, age 10 months. Symptoms: watery diarrhoea more than 8 times today, vomited 3 times, sunken eyes, skin pinch goes back very slowly, no tears when crying, lethargic. Last wet nappy was 6 hours ago.",
       "trigger_keywords": [
+        "watery",
         "diarrhoea",
-        "dehydration",
-        "infant"
+        "sunken"
       ],
       "primary_response": {
         "urgency": "EMERGENCY",
@@ -191,9 +191,8 @@
       "title_en": "Child mild diarrhoea, drinking well",
       "user_prompt": "Patient: male, age 3 years. Symptoms: loose stool 3 times today, no blood, drinking ORS when offered, mild stomach cramps. Still playful. No fever. Mother prepared ORS correctly.",
       "trigger_keywords": [
-        "diarrhoea",
         "loose stool",
-        "child"
+        "ors"
       ],
       "primary_response": {
         "urgency": "MONITOR",
@@ -226,9 +225,8 @@
       "title_en": "Severe acute malnutrition with bilateral oedema",
       "user_prompt": "Patient: male, age 18 months. MUAC measured at 10.2 cm. Both feet have pitting oedema. Child is very weak, barely responds, has dry peeling skin. Mother says he stopped eating 2 weeks ago. No recent illness reported.",
       "trigger_keywords": [
-        "malnutrition",
-        "oedema",
-        "muac"
+        "muac",
+        "pitting"
       ],
       "primary_response": {
         "urgency": "EMERGENCY",
@@ -263,7 +261,6 @@
       "title_en": "Moderate acute malnutrition, stable, for follow-up",
       "user_prompt": "Patient: female, age 2 years. MUAC 11.8 cm, no oedema, eating small amounts when encouraged, no acute illness. Mother reports child has been thin for 3 months. Weight-for-height Z-score estimated at minus 2.",
       "trigger_keywords": [
-        "malnutrition",
         "muac",
         "thin"
       ],
@@ -300,9 +297,9 @@
       "title_en": "Postpartum haemorrhage after home delivery",
       "user_prompt": "Patient: female, age 26, delivered at home 2 hours ago. Symptoms: heavy bleeding that has soaked through 3 cloths, feeling dizzy and weak, heart beating fast, skin pale and cold. Baby delivered normally but placenta not yet passed.",
       "trigger_keywords": [
-        "postpartum",
+        "delivered",
         "bleeding",
-        "delivery"
+        "placenta"
       ],
       "primary_response": {
         "urgency": "EMERGENCY",
@@ -371,8 +368,8 @@
       "title_en": "Adult snakebite with fang marks, limb swelling",
       "user_prompt": "Patient: male, age 35. Bitten on right foot by a snake in the field 45 minutes ago. Two fang marks visible, foot and ankle swelling rapidly, severe local pain. Patient feels nauseous. Snake not identified but described as brown and large.",
       "trigger_keywords": [
-        "snakebite",
         "snake",
+        "fang",
         "swelling"
       ],
       "primary_response": {
@@ -447,8 +444,8 @@
       "user_prompt": "Patient: male, age 19. Involved in motorcycle accident 20 minutes ago. Not wearing helmet. Currently unconscious, bleeding from head wound, breathing irregularly, does not respond to voice. Bystanders say he was conscious briefly right after crash.",
       "trigger_keywords": [
         "unconscious",
-        "head injury",
-        "accident"
+        "accident",
+        "helmet"
       ],
       "primary_response": {
         "urgency": "EMERGENCY",
@@ -485,8 +482,8 @@
       "user_prompt": "Patient: female, age 34. Cut her forearm on a hoe blade while working 3 hours ago. Wound is about 4 cm long, bled initially but now stopped with cloth pressure. Wound edges are clean. Patient is alert, no fever, tetanus vaccination status unknown.",
       "trigger_keywords": [
         "wound",
-        "laceration",
-        "cut"
+        "cut",
+        "tetanus"
       ],
       "primary_response": {
         "urgency": "ROUTINE",
@@ -634,7 +631,7 @@
       "user_prompt": "Patient : homme, 42 ans. Symptômes : diarrhée liquide depuis hier soir, huit selles dans la nuit, légèrement étourdi, lèvres sèches, boit encore un peu d'eau. Pas de sang dans les selles. Pas de fièvre. Travaille aux champs sous forte chaleur.",
       "trigger_keywords": [
         "diarrhée",
-        "déshydratation",
+        "selles",
         "étourdi"
       ],
       "primary_response": {
@@ -672,8 +669,8 @@
       "user_prompt": "Majiyyaci: yaro, watanni 6. Alamomi: zazzabi mai tsanani, kin sha nono, kuka ba ya tsayawa, jiki na zafi sosai. Uwa ta ce yaro bai yi barci dare baki dayan ba. Ana zaune kusa da ruwa mai tsayawa.",
       "trigger_keywords": [
         "zazzabi",
-        "jariiri",
-        "zafi"
+        "zafi",
+        "yaro"
       ],
       "primary_response": {
         "urgency": "URGENT",

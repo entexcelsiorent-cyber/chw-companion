@@ -1136,6 +1136,28 @@
     const dp = document.getElementById('detail-progress');
     if (dp) dp.style.display = '';
 
+    // Cache short-circuit: if symptoms match a known scenario, serve the
+    // pre-generated Gemma 3 1B response from scenarios.json. Preserves the
+    // two-phase visual rhythm so the demo still feels live.
+    const cached = matchCachedScenario(symptoms);
+    if (cached) {
+      flagCacheHit();
+      setTimeout(() => {
+        currentTriage.primary = cached.primary_response;
+        renderPrimary(cached.primary_response);
+        showScreen('result-screen');
+      }, 600);
+      setTimeout(() => {
+        currentTriage.detail = cached.detail_response;
+        renderDetail(cached.detail_response);
+        if (dp) dp.style.display = 'none';
+        if (currentTriage.primary && !currentTriage.saved) {
+          saveToQueue(currentTriage);
+        }
+      }, 1400);
+      return;
+    }
+
     // Kick off both calls in parallel; render primary the moment it lands,
     // then update with detail when that comes back.
     const primaryP = callEndpoint('/triage/primary', payload, PRIMARY_TIMEOUT_MS)
@@ -1163,6 +1185,49 @@
         saveToQueue(currentTriage);
       }
     });
+  }
+
+  // ── Cached canonical scenarios ──────────────────────────────────────────────
+  // scenarios.json bundles ~20 pre-generated Gemma 3 1B responses for common
+  // CHW prompts. A match returns instantly (no network), enabling true offline
+  // mode and a live-feeling demo without waiting on the backend.
+  let CACHED_SCENARIOS = null;
+
+  async function loadCachedScenarios() {
+    if (CACHED_SCENARIOS !== null) return CACHED_SCENARIOS;
+    try {
+      const res = await fetch('scenarios.json', { cache: 'force-cache' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      CACHED_SCENARIOS = (data.scenarios || []).filter(
+        s => s && s.primary_response && s.detail_response
+      );
+      console.log(`[cache] loaded ${CACHED_SCENARIOS.length} populated scenarios`);
+    } catch (e) {
+      console.warn('[cache] load failed:', e);
+      CACHED_SCENARIOS = [];
+    }
+    return CACHED_SCENARIOS;
+  }
+
+  // Substring keyword match (case-insensitive). Returns the first scenario
+  // whose trigger_keywords are ALL present in the input, or null.
+  function matchCachedScenario(symptoms) {
+    if (!CACHED_SCENARIOS || CACHED_SCENARIOS.length === 0) return null;
+    const s = (symptoms || '').toLowerCase();
+    for (const sc of CACHED_SCENARIOS) {
+      const keys = (sc.trigger_keywords || []).map(k => k.toLowerCase());
+      if (keys.length === 0) continue;
+      if (keys.every(k => s.includes(k))) return sc;
+    }
+    return null;
+  }
+
+  // Surface cache hits in the status badge so the demo can show "CACHED" vs
+  // "LIVE". updateStatusBadge() will overwrite this on its next 30s tick.
+  function flagCacheHit() {
+    const text = document.getElementById('status-text');
+    if (text) text.textContent = 'CACHED';
   }
 
   async function callEndpoint(path, payload, timeoutMs) {
@@ -1508,6 +1573,7 @@
   updateQueueBadge();
   updateStatusBadge();
   setInterval(updateStatusBadge, 30000);
+  loadCachedScenarios();
 </script>
 
 </body>
