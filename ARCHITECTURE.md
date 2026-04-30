@@ -87,7 +87,7 @@ When the cache misses and connectivity is available, the frontend calls the Flas
 
 `backend/server.py` is intentionally small. Three routes (`/health`, `/triage/primary`, `/triage/detail`), a single Gemma loader, and mock-response fallbacks for local CPU development. The loader bails to mock mode if `CHW_MOCK_ONLY` is set or no CUDA GPU is present — local CPU inference of Gemma 3 1B is ≈70 s and not useful for live work.
 
-Model loading uses `device_map="auto"` and `dtype=torch.float16` — the configuration that was empirically validated on Kaggle T4 (Apr 24, see `docs/superpowers/notes/2026-04-27-gemma4-status.md`). The chat template is normalised across transformers versions; a fallback merges the system prompt into the user turn for Gemma variants that reject the system role.
+Model loading uses `device_map="auto"` and `dtype=torch.float16` — the configuration that was empirically validated on Kaggle T4 (Gemma 3 1B fp16 produced 299 valid clinical-JSON tokens at 15 tok/s; full schema 19.96 s; primary-only 50 tokens at 3.3 s — these latencies drove the two-phase split). The chat template is normalised across transformers versions; a fallback merges the system prompt into the user turn for Gemma variants that reject the system role.
 
 JSON extraction is a regex `\{.*\}` followed by `json.loads`; on parse failure the route returns a deterministic mock response so the frontend never sees a 500. This is by design: a CHW should never be blocked by a model parse failure.
 

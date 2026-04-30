@@ -1,0 +1,79 @@
+name: smoke
+
+# This workflow runs in the standalone CHW Companion repo (post-subtree-split).
+# In the OMEGA monorepo this file sits at chw-companion/.github/workflows/ and
+# is NOT picked up by GitHub Actions (workflows must be at repo root). The
+# monorepo has its own .github/workflows/test.yml that covers chw-companion +
+# omega_platform.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  chw-companion:
+    name: chw-companion smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask==3.1.0 flask-cors==5.0.0
+
+      - name: scenarios.json parses cleanly
+        run: |
+          python -c "import json; \
+            d = json.load(open('app/scenarios.json')); \
+            scenarios = d.get('scenarios', []); \
+            assert len(scenarios) >= 20, f'expected >=20 scenarios, got {len(scenarios)}'; \
+            for s in scenarios: \
+              assert s.get('id'), f'missing id'; \
+              assert s.get('user_prompt'), 'missing user_prompt'; \
+              assert s.get('trigger_keywords'), 'missing trigger_keywords'; \
+            print(f'OK: {len(scenarios)} scenarios')"
+
+      - name: trigger keywords self-match each scenario's own prompt
+        run: |
+          python -c "import json; \
+            d = json.load(open('app/scenarios.json')); \
+            failures = []; \
+            for s in d.get('scenarios', []): \
+              prompt = (s.get('user_prompt') or '').lower(); \
+              keys = [k.lower() for k in (s.get('trigger_keywords') or [])]; \
+              missing = [k for k in keys if k not in prompt]; \
+              if missing: failures.append((s.get('id'), missing)); \
+            assert not failures, f'self-match failures: {failures}'; \
+            print(f'OK: all scenarios self-match')"
+
+      - name: server.py imports cleanly in mock-only mode
+        env:
+          CHW_MOCK_ONLY: '1'
+        run: |
+          python -c "import sys; \
+            sys.path.insert(0, 'backend'); \
+            import server; \
+            client = server.app.test_client(); \
+            r = client.get('/health'); \
+            assert r.status_code == 200; \
+            data = r.get_json(); \
+            assert data.get('status') == 'ok'; \
+            print(f'OK: health responded {data}')"
+
+      - name: index.html has the safety-banner text and override fn
+        run: |
+          python -c "txt = open('app/index.html', encoding='utf-8').read(); \
+            assert 'Decision support tool only' in txt or 'decision support tool only' in txt.lower(), \
+              'safety disclaimer text missing'; \
+            assert 'applyEmergencyOverride' in txt, 'EMERGENCY override fn missing'; \
+            assert 'EMERGENCY_TRIGGERS' in txt, 'EMERGENCY trigger list missing'; \
+            print('OK: safety markers present')"
