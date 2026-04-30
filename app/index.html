@@ -1927,8 +1927,9 @@
     if (cached) {
       flagCacheHit();
       setTimeout(() => {
-        currentTriage.primary = cached.primary_response;
-        renderPrimary(cached.primary_response);
+        const primary = applyEmergencyOverride(cached.primary_response, symptoms);
+        currentTriage.primary = primary;
+        renderPrimary(primary);
         showScreen('result-screen');
       }, 600);
       setTimeout(() => {
@@ -1950,7 +1951,8 @@
     const detailP = callEndpoint('/triage/detail', payload, DETAIL_TIMEOUT_MS)
       .catch(() => mockDetail(payload.symptoms));
 
-    primaryP.then(primary => {
+    primaryP.then(rawPrimary => {
+      const primary = applyEmergencyOverride(rawPrimary, symptoms);
       currentTriage.primary = primary;
       renderPrimary(primary);
       showScreen('result-screen');
@@ -2083,6 +2085,72 @@
         if (el) el.classList.add('done');
       }, 400 + i * 900);
     });
+  }
+
+  // ── Hard-coded EMERGENCY override (safety floor) ────────────────────────────
+  // Per the brief's Apr 25 spec: a defined list of red-flag presentations must
+  // produce EMERGENCY/red regardless of model output. This is the deterministic
+  // safety floor — the model cannot downgrade these. Triggers are matched as
+  // case-insensitive substrings against the CHW's symptom text. False positives
+  // here are acceptable (escalation always beats a missed emergency); false
+  // negatives are not. See SAFETY.md for design rationale.
+  const EMERGENCY_TRIGGERS = [
+    // Neurological
+    'unconscious', 'unresponsive', 'not responding',
+    'convuls', 'seizure', 'fitting',
+    'altered consciousness', 'loss of consciousness',
+    // Respiratory
+    'not breathing', 'cannot breathe', 'severe difficulty breathing',
+    'gasping', 'turning blue', 'cyanosis',
+    // Bleeding
+    'severe bleeding', 'bleeding heavily', 'bleeding will not stop',
+    'haemorrhag', 'hemorrhag',
+    'postpartum bleeding', 'after delivery bleeding',
+    // Cardiovascular
+    'chest pain', 'crushing chest',
+    // Obstetric red flags
+    'pregnant.*convuls', 'convuls.*pregnant',
+    'eclampsia',
+    // Trauma
+    'unconscious.*accident', 'accident.*unconscious',
+    'snake.*systemic', 'snake.*blurred', 'snake.*paralys',
+  ];
+
+  function isEmergencyByOverride(symptoms) {
+    if (!symptoms) return false;
+    const s = String(symptoms).toLowerCase();
+    return EMERGENCY_TRIGGERS.some(trig => {
+      // Treat triggers containing '.*' as regex; everything else as substring.
+      if (trig.includes('.*')) {
+        try { return new RegExp(trig, 'i').test(s); }
+        catch { return false; }
+      }
+      return s.includes(trig);
+    });
+  }
+
+  function applyEmergencyOverride(primary, symptoms) {
+    if (!primary) return primary;
+    if (!isEmergencyByOverride(symptoms)) return primary;
+    // Already EMERGENCY — leave the model's recommended_action intact, just
+    // ensure the colour and tier match.
+    if ((primary.urgency || '').toUpperCase() === 'EMERGENCY' &&
+        (primary.urgency_color || '').toLowerCase() === 'red') {
+      return primary;
+    }
+    // Override: force EMERGENCY/red, preserve the model's action text if it's
+    // non-trivial, otherwise fall back to a conservative referral instruction.
+    const action = (primary.recommended_action && primary.recommended_action.length > 20)
+      ? primary.recommended_action
+      : 'Refer immediately to nearest health facility. Do not delay. Stabilise and accompany if possible.';
+    return {
+      ...primary,
+      urgency: 'EMERGENCY',
+      urgency_color: 'red',
+      recommended_action: action,
+      confidence: primary.confidence || 'high',
+      _override_applied: true,
+    };
   }
 
   // ── Mock fallbacks (used when backend unreachable) ─────────────────────────

@@ -1,6 +1,14 @@
 # 🏥 Community Health Worker Companion
 ## Gemma 4 Good Hackathon — Kaggle 2026
 
+> ⚠️ **Deprecated concept doc.** This file describes the original April-22 vision and contains
+> claims that did not survive hardware testing — specifically "$50 Android phone", "<5 seconds
+> on CPU", and "on-device Gemma 4". The shipped architecture is Gemma 3 1B served from a
+> Kaggle T4 inference tier with a 20-scenario cache layer for offline coverage. See
+> [`README.md`](README.md), [`ARCHITECTURE.md`](ARCHITECTURE.md), [`SAFETY.md`](SAFETY.md),
+> and [`SUBMISSION.md`](SUBMISSION.md) for the current and accurate description. This file
+> is kept as historical context for how the concept evolved.
+
 ---
 
 ## Elevator Pitch
