@@ -84,7 +84,7 @@ This is not "an LLM wrapped in a UI" — it is a careful split of cache + small-
 
 ## Submission contents
 
-- Code: this repository (`chw-companion/` directory in the parent OMEGA ML platform repo, Apache 2.0)
+- Code: this repository, Apache 2.0 (extracted from a private monorepo via `git subtree split` so the public repo carries only CHW Companion's history)
 - Demo video: 90 s, no narration overlay, three scenarios (English malaria pediatric, Swahili snake bite, offline-cache demonstration). Recorded against the cached-scenario layer so all responses arrive in under 2 s and the full demo fits one take.
 - Documentation: `README.md`, `ARCHITECTURE.md`, `SAFETY.md`, this file
 - Hardware-validation notebooks: `test_gemma4_hardware_v2.py`, `test_gemma4_hardware_1b.py` (Kaggle T4 reference paths)
