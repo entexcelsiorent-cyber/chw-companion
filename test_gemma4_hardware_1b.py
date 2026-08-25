@@ -260,4 +260,4 @@ result = {
 out_path = Path("/kaggle/working/gemma4_hardware_test_1b.json")
 out_path.write_text(json.dumps(result, indent=2))
 print(f"\nSaved full result to {out_path}")
-print("Download from Kaggle notebook Output tab, commit to results/ locally.")
+print("Download from Kaggle notebook Output tab and keep with the project.")

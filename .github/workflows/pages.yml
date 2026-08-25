@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+# Deploys app/index.html (with inlined scenarios.json) as a public static site.
+# The cached-scenario layer works fully offline; live inference requires setting
+# window.CHW_BACKEND in the browser console (see README).
+# Paths assume the extracted-repo layout (app/ at repository root).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/index.html"
+      - "app/scenarios.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify scenarios inline in index.html
+        run: |
+          python -c "
+          txt = open('app/index.html', encoding='utf-8').read()
+          assert 'cached-scenarios-data' in txt, 'inline JSON block missing'
+          import json, re
+          m = re.search(r'<script type=\"application/json\" id=\"cached-scenarios-data\">(.*?)</script>', txt, re.DOTALL)
+          assert m, 'cannot find inline JSON block'
+          data = json.loads(m.group(1))
+          n = len(data.get('scenarios', []))
+          model = data.get('model_id', 'unknown')
+          assert n >= 20, f'expected >=20 scenarios, got {n}'
+          print(f'OK: {n} scenarios, model_id={model}')
+          "
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

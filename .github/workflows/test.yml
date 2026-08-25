@@ -1,10 +1,9 @@
 name: smoke
 
 # This workflow runs in the standalone CHW Companion repo (post-subtree-split).
-# In the OMEGA monorepo this file sits at chw-companion/.github/workflows/ and
-# is NOT picked up by GitHub Actions (workflows must be at repo root). The
-# monorepo has its own .github/workflows/test.yml that covers chw-companion +
-# omega_platform.
+# Nested under a parent repository it is NOT picked up by GitHub Actions
+# (workflows must sit at that repository's root). Paths assume app/ and
+# backend/ are at the repository root.
 
 on:
   push:
@@ -77,3 +76,19 @@ jobs:
             assert 'applyEmergencyOverride' in txt, 'EMERGENCY override fn missing'; \
             assert 'EMERGENCY_TRIGGERS' in txt, 'EMERGENCY trigger list missing'; \
             print('OK: safety markers present')"
+
+      - name: scenarios.json is inlined in index.html
+        run: |
+          python -c "
+          import json, re
+          txt = open('app/index.html', encoding='utf-8').read()
+          disk = json.load(open('app/scenarios.json', encoding='utf-8'))
+          m = re.search(r'<script type=\"application/json\" id=\"cached-scenarios-data\">(.*?)</script>', txt, re.DOTALL)
+          assert m, 'cannot find inline JSON block'
+          inline = json.loads(m.group(1))
+          n = len(inline.get('scenarios', []))
+          assert n >= 20, f'expected >=20 inlined scenarios, got {n}'
+          assert inline.get('model_id') == disk.get('model_id'), 'inline model_id drifted from scenarios.json'
+          assert n == len(disk.get('scenarios', [])), 'inline scenario count drifted from scenarios.json'
+          print('OK:', n, 'scenarios inlined, model_id=', inline.get('model_id'))
+          "

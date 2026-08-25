@@ -198,7 +198,7 @@ if warm_dt < 5:
     action = "Production path latency confirmed under gate. Server.py can ship as-is."
 elif warm_dt < 15:
     verdict = "MARGINAL"
-    action = "Add loading UX to chw-companion/app/index.html (per Phase 1.3). Consider gemma-4-1b-it."
+    action = "Add loading UX to app/index.html (per Phase 1.3). Consider gemma-4-1b-it."
 else:
     verdict = "FAIL"
     action = "Pivot: try gemma-4-1b-it with 4-bit quantisation, or cached offline responses."
@@ -235,4 +235,4 @@ result = {
 out_path = Path("/kaggle/working/gemma4_hardware_test_v2.json")
 out_path.write_text(json.dumps(result, indent=2))
 print(f"\nSaved full result to {out_path}")
-print("Download from Kaggle notebook Output tab, commit to results/ locally.")
+print("Download from Kaggle notebook Output tab and keep with the project.")

@@ -45,7 +45,7 @@ else:
     print("WARNING: running on CPU — inference will be 10-30x slower")
 
 # --- 3. Model selection (with availability fallback) -----------------------
-# Primary: the ID referenced in chw-companion/backend/server.py.
+# Primary: the ID referenced in backend/server.py.
 # Fallback: Gemma 3 4B instruct — same size class, publicly released, gated but accessible.
 CANDIDATES = [
     "google/gemma-4-e4b-it",
@@ -152,4 +152,4 @@ result = {
 out_path = Path("/kaggle/working/gemma4_hardware_test.json")
 out_path.write_text(json.dumps(result, indent=2))
 print(f"\nSaved full result to {out_path}")
-print("Download from the Kaggle notebook's Output tab, commit to results/ locally.")
+print("Download from the Kaggle notebook's Output tab and keep with the project.")

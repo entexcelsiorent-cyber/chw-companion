@@ -1817,7 +1817,9 @@
 </script>
 <script>
   // ── Configuration ──────────────────────────────────────────────────────────
-  const API_BASE = (location.protocol === 'file:' ? 'http://localhost:5000' : '');
+  // Override at runtime: window.CHW_BACKEND = "https://xxxx.ngrok-free.app"
+  const API_BASE = window.CHW_BACKEND
+      || (location.protocol === 'file:' ? 'http://localhost:5000' : '');
   const QUEUE_KEY = 'chw_queue_v1';
   const PRIMARY_TIMEOUT_MS = 20000;   // 7s expected, 20s hard cap
   const DETAIL_TIMEOUT_MS  = 45000;   // 25s expected, 45s hard cap
@@ -1921,7 +1923,7 @@
     if (dp) dp.style.display = '';
 
     // Cache short-circuit: if symptoms match a known scenario, serve the
-    // pre-generated Gemma 3 1B response from scenarios.json. Preserves the
+    // pre-generated Gemma 4 response from scenarios.json. Preserves the
     // two-phase visual rhythm so the demo still feels live.
     const cached = matchCachedScenario(symptoms);
     if (cached) {
@@ -1974,7 +1976,7 @@
   }
 
   // ── Cached canonical scenarios ──────────────────────────────────────────────
-  // scenarios.json bundles ~20 pre-generated Gemma 3 1B responses for common
+  // scenarios.json bundles ~20 pre-generated Gemma 4 responses for common
   // CHW prompts. A match returns instantly (no network), enabling true offline
   // mode and a live-feeling demo without waiting on the backend.
   let CACHED_SCENARIOS = null;
@@ -2042,7 +2044,7 @@
     // Tolerate three response shapes from server.py / Gemma:
     //   1. application/json with a clean object  -> use as-is
     //   2. text/plain or text/json wrapping ```json {...} ``` markdown fence
-    //      (Gemma 3 1B emits this format frequently)
+    //      (small Gemma checkpoints emit this format frequently)
     //   3. text/plain with bare {...} JSON
     const ct = res.headers.get('content-type') || '';
     if (ct.includes('application/json')) return await res.json();

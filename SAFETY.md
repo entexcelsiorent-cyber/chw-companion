@@ -45,7 +45,7 @@ The colour palette follows the WHO IMCI triage convention CHWs are already train
 Four mechanisms keep urgency assignment biased toward escalation rather than reassurance, layered from soft to hard:
 
 1. **Prompt-level conservatism.** The system prompts in `backend/server.py` instruct the model explicitly: *"Be conservative — when uncertain, escalate urgency. Never make a definitive diagnosis. Always support, never replace, clinical judgment."* This is the soft layer.
-2. **Curated cache tiers.** The 20 cached scenarios were reviewed and their urgency tiers manually corrected. First-pass Gemma 3 1B generation collapsed 14/20 scenarios to URGENT/red regardless of true severity; the curation pass set each scenario's tier to match its clinical severity. For canonical red-flag presentations (convulsion in an infant, postpartum haemorrhage, road-accident with unconsciousness, snake bite with systemic symptoms, pre-eclampsia signs), the cache encodes EMERGENCY directly.
+2. **Curated cache tiers.** The 20 cached scenarios were reviewed and their urgency tiers manually corrected. First-pass generation collapsed 14/20 scenarios to URGENT/red regardless of true severity; the curation pass set each scenario's tier to match its clinical severity. For canonical red-flag presentations (convulsion in an infant, postpartum haemorrhage, road-accident with unconsciousness, snake bite with systemic symptoms, pre-eclampsia signs), the cache encodes EMERGENCY directly.
 3. **Mock-mode keyword fallback.** When the backend is unreachable or returns no parseable response, the frontend's `mockPrimary()` keyword check returns EMERGENCY/red on red-flag substrings. This guards the offline-degraded path.
 4. **Render-layer EMERGENCY override** (deterministic, applied to *every* primary response before rendering — cache hit, live inference, or mock alike). For a defined trigger list, the urgency tier is forced to EMERGENCY/red **regardless of model output**. This is a hard override at the response-shaping layer (`applyEmergencyOverride()` in `app/index.html`), not a soft prompt instruction.
 
@@ -67,13 +67,13 @@ When triggered, the override:
 
 ### Why hard-code rather than rely on the model
 
-Open small models occasionally collapse to a wrong urgency tier — we observed exactly this in the first cache-generation pass, where Gemma 3 1B mapped 14 of 20 scenarios to the same URGENT/red tier regardless of severity. A hard-coded floor on the most dangerous presentations means the worst-case model failure for those cases is "the model said routine, the app showed EMERGENCY anyway." That is the failure mode we want.
+Open small models occasionally collapse to a wrong urgency tier — we observed exactly this in the first cache-generation pass, where the initial model mapped 14 of 20 scenarios to the same URGENT/red tier regardless of severity. A hard-coded floor on the most dangerous presentations means the worst-case model failure for those cases is "the model said routine, the app showed EMERGENCY anyway." That is the failure mode we want.
 
 False-positive cost (an unnecessary referral on a borderline phrase) is far smaller than false-negative cost (a missed emergency). The trigger list is therefore deliberately broad. CHW Companion is decision *support* — a CHW reading the EMERGENCY card who concludes from clinical examination that the case is not truly urgent has the final word. The app does not block their judgement; it raises a floor.
 
 ## Cached responses are clinically curated
 
-The 20 cached scenarios are not raw model output. The first-pass Gemma 3 1B generation produced clinically incorrect urgency tiers on most scenarios (10 should-be EMERGENCY collapsed to URGENT; all 20 were tagged red regardless of severity; 3 language tags were wrong). Each scenario was reviewed and corrected:
+The 20 cached scenarios are not raw model output. The first generation pass produced clinically incorrect urgency tiers on most scenarios (10 should-be EMERGENCY collapsed to URGENT; all 20 were tagged red regardless of severity; 3 language tags were wrong). The cache is regenerated with Gemma 4 for the final submission using `regen_scenarios_gemma4.py`. Each scenario was reviewed and corrected:
 
 - Urgency tier set to match the clinical severity (not the model's collapsed default)
 - Urgency colour aligned to tier (red/orange/yellow/green), not always red
@@ -101,16 +101,17 @@ We do not show error stack traces, JSON dumps, or server messages to the user. E
 - We do not store patient data anywhere off-device. The triage queue lives in browser memory and is wiped on reload. There is no analytics pipeline, no telemetry, no logging of symptom strings to disk.
 - We do not claim regulatory clearance. CHW Companion has no FDA, EMA, or WHO pre-qualification. The path to that clearance is the impact pathway in `README.md`.
 - We do not rank patients on demographics. The triage queue ranks on urgency tier only. There is no age-weighting, no sex-weighting, no socioeconomic input.
-- We do not auto-translate the disclaimer. The English disclaimer is the disclaimer. Localising it requires translation review by clinicians fluent in the target language and is part of the pilot phase, not the hackathon entry.
+- We do not auto-translate the disclaimer. The English disclaimer is the disclaimer. Localising it requires translation review by clinicians fluent in the target language and is part of a future pilot, not this prototype.
 - We do not propose specific drug doses. The recommended-action field is a triage decision (refer, monitor, treat per protocol), not a prescription.
 
-## Why a small model rather than a large one
+## Why Gemma 4 and why this architecture
 
-Gemma 3 1B is the production model. A larger model (E4B, 4B, or a frontier API model) would produce richer prose. We chose the smaller model anyway because:
+Gemma 4 (E4B, or the text-only E2B variant for lower latency) is the production model. A frontier API model would produce richer prose. We use Gemma 4 because:
 
-- **It runs on infrastructure CHW programmes can actually afford.** Kaggle's free T4 tier is the entire production path during this hackathon. A pilot deployment can stand up an equivalent tier on $50–200/month of cloud GPU; a frontier API costs orders of magnitude more per query and is a non-starter for a CHW programme budget.
-- **Smaller surface area = fewer ways to fail spectacularly.** The cached-scenario curation found tier collapse and language tagging errors that we caught and fixed because the failure modes were deterministic. Larger models hallucinate in more sophisticated ways that are harder to spot.
-- **Cache + small model > large model alone for this user.** The 20-scenario cache covers the most common cases at zero latency and zero cost. Adding a larger model on top of a strong cache is a much smaller marginal value than the marketing version of "ChatGPT for CHWs" suggests.
+- **It runs on infrastructure CHW programmes can actually afford.** Kaggle's free T4 tier was the production path during the 2026 Gemma 4 Good Hackathon build. A pilot deployment can stand up an equivalent tier on $50–200/month of cloud GPU; a frontier API costs orders of magnitude more per query.
+- **Open weights are non-negotiable for this use case.** Cached scenarios can be pre-generated once and shipped as static JSON only because the weights are open. A closed API cannot produce an offline cache.
+- **Gemma 4's native 140+ language support is load-bearing.** The app handles Swahili, Hausa, French, and English with the same model — no routing, no translation layer, no per-language fine-tune cost.
+- **Cache + Gemma 4 > Gemma 4 alone for this user.** The 20-scenario cache covers the most common cases at zero latency and zero cost. Smaller failure surface because deterministic cache responses are auditable in a way live inference is not.
 
 ## Auditability
 
