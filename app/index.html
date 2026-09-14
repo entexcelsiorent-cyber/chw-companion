@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="theme-color" content="#1a2e1a">
-<meta name="description" content="AI triage assistant for Community Health Workers">
+<meta name="description" content="Decision-support triage PWA for Community Health Workers. Offline curated scenarios; not a medical device.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CHW Companion">
 <title>CHW Companion — Triage AI</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -818,9 +822,9 @@
     </div>
   </header>
 
-  <!-- Always-visible safety disclaimer -->
-  <div class="safety-banner">
-    <strong>Decision support only — not a diagnosis.</strong>
+  <!-- Always-visible safety disclaimer (non-dismissible) -->
+  <div class="safety-banner" role="note" aria-label="Safety disclaimer">
+    <strong>Decision support tool only. Not a diagnosis.</strong>
     Always use your clinical judgment. When uncertain, escalate urgency.
   </div>
 
@@ -845,13 +849,14 @@
       </div>
       <div class="lang-row">
         <span>🌍 Language:</span>
-        <select id="language">
+        <select id="language" title="Demo cache coverage is EN/SW/FR/HA only">
           <option>English</option>
           <option>Français</option>
-          <option>Español</option>
-          <option>Português</option>
           <option>Kiswahili</option>
           <option>Hausa</option>
+          <option disabled>—— UI only (not in demo cache) ——</option>
+          <option>Español</option>
+          <option>Português</option>
           <option>العربية</option>
           <option>हिन्दी</option>
           <option>Amharic</option>
@@ -917,7 +922,7 @@
       </div>
       <div class="loading-step" id="step-2">
         <div class="step-dot"></div>
-        Ranking urgency (Gemma 4)
+        Ranking urgency (cache or model)
       </div>
       <div class="loading-step" id="step-3">
         <div class="step-dot"></div>
@@ -1039,6 +1044,10 @@
       <div id="queue-monitor" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
+    <p class="disclaimer" style="margin:12px 8px 0;font-size:11px;line-height:1.4;">
+      Queue entries (age, sex, symptoms) stay in this device’s browser storage until you clear them.
+      On a shared phone, clear the queue after use.
+    </p>
     <div class="queue-action-row">
       <button class="btn-secondary" onclick="newAssessment()">＋ New Patient</button>
       <button class="btn-secondary danger" onclick="clearQueue()">🗑 Clear Queue</button>
@@ -1046,9 +1055,9 @@
 
   </div>
 
-  <!-- Powered by -->
+  <!-- Powered by — honest: offline = curated cache; live Gemma optional when online -->
   <div class="powered-by">
-    Powered by <span class="gemma-badge">Gemma 4</span> · Multilingual · 35+ languages
+    Offline curated cache · Optional <span class="gemma-badge">Gemma 4</span> when online · Demo languages (EN/SW/FR/HA)
   </div>
 
 </div>
@@ -1923,8 +1932,9 @@
     if (dp) dp.style.display = '';
 
     // Cache short-circuit: if symptoms match a known scenario, serve the
-    // pre-generated Gemma 4 response from scenarios.json. Preserves the
-    // two-phase visual rhythm so the demo still feels live.
+    // curated cached response from scenarios.json (currently tagged
+    // google/gemma-3-1b-it — not live Gemma 4). Preserves the two-phase
+    // visual rhythm so the demo still feels live offline.
     const cached = matchCachedScenario(symptoms);
     if (cached) {
       flagCacheHit();
@@ -1975,10 +1985,10 @@
     });
   }
 
-  // ── Cached canonical scenarios ──────────────────────────────────────────────
-  // scenarios.json bundles ~20 pre-generated Gemma 4 responses for common
-  // CHW prompts. A match returns instantly (no network), enabling true offline
-  // mode and a live-feeling demo without waiting on the backend.
+  // ── Cached canonical scenarios (PWA offline CDS) ────────────────────────────
+  // scenarios.json bundles ~20 curated responses for common CHW prompts.
+  // Cache hits return instantly (no network / no on-device generative model).
+  // This is the primary offline product path — not full generative triage.
   let CACHED_SCENARIOS = null;
 
   async function loadCachedScenarios() {
@@ -2443,6 +2453,12 @@
   updateStatusBadge();
   setInterval(updateStatusBadge, 30000);
   loadCachedScenarios();
+  // Register service worker for offline PWA shell (HTTPS / localhost only).
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.warn('[pwa] service worker registration skipped:', err);
+    });
+  }
 </script>
 
 </body>

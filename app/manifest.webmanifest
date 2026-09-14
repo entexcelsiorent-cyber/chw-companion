@@ -1,0 +1,20 @@
+{
+  "name": "CHW Companion",
+  "short_name": "CHW Triage",
+  "description": "Decision-support triage PWA for Community Health Workers. Offline curated scenarios; optional live inference when online. Not a medical device.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a2e1a",
+  "theme_color": "#1a2e1a",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

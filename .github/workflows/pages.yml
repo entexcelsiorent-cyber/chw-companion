@@ -11,6 +11,9 @@ on:
     paths:
       - "app/index.html"
       - "app/scenarios.json"
+      - "app/manifest.webmanifest"
+      - "app/sw.js"
+      - "app/icon.svg"
   workflow_dispatch:
 
 permissions:

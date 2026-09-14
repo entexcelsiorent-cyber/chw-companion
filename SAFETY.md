@@ -73,7 +73,7 @@ False-positive cost (an unnecessary referral on a borderline phrase) is far smal
 
 ## Cached responses are clinically curated
 
-The 20 cached scenarios are not raw model output. The first generation pass produced clinically incorrect urgency tiers on most scenarios (10 should-be EMERGENCY collapsed to URGENT; all 20 were tagged red regardless of severity; 3 language tags were wrong). The cache is regenerated with Gemma 4 for the final submission using `regen_scenarios_gemma4.py`. Each scenario was reviewed and corrected:
+The 20 cached scenarios are not raw model output. The first generation pass produced clinically incorrect urgency tiers on most scenarios (10 should-be EMERGENCY collapsed to URGENT; all 20 were tagged red regardless of severity; 3 language tags were wrong). The checked-in offline cache remains tagged **`google/gemma-3-1b-it`** (curated). Optional later regen with Gemma 4 via `regen_scenarios_gemma4.py` is **not** applied to the in-repo cache. Each scenario was reviewed and corrected:
 
 - Urgency tier set to match the clinical severity (not the model's collapsed default)
 - Urgency colour aligned to tier (red/orange/yellow/green), not always red
@@ -98,7 +98,7 @@ We do not show error stack traces, JSON dumps, or server messages to the user. E
 
 ## What we explicitly do NOT do
 
-- We do not store patient data anywhere off-device. The triage queue lives in browser memory and is wiped on reload. There is no analytics pipeline, no telemetry, no logging of symptom strings to disk.
+- We do not send patient data to an analytics or telemetry pipeline, and the Flask backend does not implement durable symptom logging. The on-device triage queue **does** persist age, sex, and free-text symptoms in browser `localStorage` (`chw_queue_v1` in `app/index.html`) until the CHW clears the queue — it is **not** wiped on reload. Shared-phone deployments must treat the queue as sensitive. See `docs/SAFETY_AND_COMPLIANCE.md`.
 - We do not claim regulatory clearance. CHW Companion has no FDA, EMA, or WHO pre-qualification. The path to that clearance is the impact pathway in `README.md`.
 - We do not rank patients on demographics. The triage queue ranks on urgency tier only. There is no age-weighting, no sex-weighting, no socioeconomic input.
 - We do not auto-translate the disclaimer. The English disclaimer is the disclaimer. Localising it requires translation review by clinicians fluent in the target language and is part of a future pilot, not this prototype.
@@ -110,7 +110,7 @@ Gemma 4 (E4B, or the text-only E2B variant for lower latency) is the production 
 
 - **It runs on infrastructure CHW programmes can actually afford.** Kaggle's free T4 tier was the production path during the 2026 Gemma 4 Good Hackathon build. A pilot deployment can stand up an equivalent tier on $50–200/month of cloud GPU; a frontier API costs orders of magnitude more per query.
 - **Open weights are non-negotiable for this use case.** Cached scenarios can be pre-generated once and shipped as static JSON only because the weights are open. A closed API cannot produce an offline cache.
-- **Gemma 4's native 140+ language support is load-bearing.** The app handles Swahili, Hausa, French, and English with the same model — no routing, no translation layer, no per-language fine-tune cost.
+- **Gemma 4’s broad language support is helpful for online novel cases**, but this prototype’s **measured offline coverage** is the curated EN/SW/FR/HA cache — not clinical parity across marketed “35+” / “140+” counts.
 - **Cache + Gemma 4 > Gemma 4 alone for this user.** The 20-scenario cache covers the most common cases at zero latency and zero cost. Smaller failure surface because deterministic cache responses are auditable in a way live inference is not.
 
 ## Auditability

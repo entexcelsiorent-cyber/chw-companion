@@ -77,6 +77,10 @@ jobs:
             assert 'EMERGENCY_TRIGGERS' in txt, 'EMERGENCY trigger list missing'; \
             print('OK: safety markers present')"
 
+      - name: urgency/override eval harness (override floor)
+        run: |
+          python eval/score_urgency.py --sut override --fail-on-gate
+
       - name: scenarios.json is inlined in index.html
         run: |
           python -c "
