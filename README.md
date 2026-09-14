@@ -53,7 +53,11 @@ The honest division: **cache for common presentations always; live inference for
 
 ## Live demo
 
-The frontend is meant to ship on GitHub Pages from the extracted repo (workflow: `.github/workflows/pages.yml`). **That public URL does not exist yet** — exact steps are in [`docs/PUBLISH.md`](docs/PUBLISH.md). Until then, open `app/index.html` locally or:
+**Public PWA:** https://entexcelsiorent-cyber.github.io/chw-companion/
+
+Cache-first offline triage UX (curated scenarios + emergency override). Live Gemma is optional and not required for the demo. Publish notes: [`docs/PUBLISH.md`](docs/PUBLISH.md).
+
+Local fallback:
 
 ```bash
 python -m http.server 8765 --directory app

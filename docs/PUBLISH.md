@@ -3,7 +3,8 @@
 **Goal:** Public clickable PWA demo of the **cache-first offline** triage UX.  
 **Not required:** live Gemma, weight downloads, or on-device generative SLM.
 
-**Status (2026-09-14 ops pass):** In-repo assets + workflows ready. **No live Pages URL.** Blocked on human extract → public repo → Settings → Pages. Eval gates re-verified green (override + fe_mock).
+**Status (2026-09-14 publish):** Live Pages URL: https://entexcelsiorent-cyber.github.io/chw-companion/  
+Repo: https://github.com/entexcelsiorent-cyber/chw-companion (GitHub Actions Pages). Eval gates previously green (override + fe_mock).
 
 ---
 
@@ -31,8 +32,9 @@ Portfolio story: **installable PWA + offline curated CDS**, not “Gemma on the 
 | README “Live demo” | Honest — **no invented github.io URL** |
 | Eval: `python eval/score_urgency.py --sut override --fail-on-gate` | **PASS** |
 | Eval: `python eval/score_urgency.py --sut fe_mock --fail-on-gate` | **PASS** |
-| Public GitHub repo named for CHW Companion | **Missing** (gh account has no `chw-companion` repo) |
-| Nested under `MLOmega/MLOmega/chw-companion` | **Yes** — Pages will not pick nested workflows until extract |
+| Public GitHub repo named for CHW Companion | **https://github.com/entexcelsiorent-cyber/chw-companion** |
+| Nested under `MLOmega/MLOmega/chw-companion` | Source tree yes; **extracted** standalone repo is live |
+| Live demo URL | **https://entexcelsiorent-cyber.github.io/chw-companion/** |
 
 ---
 
@@ -81,12 +83,12 @@ Alternate if the split branch already exists and files were previously untracked
 
 | Blocker | Owner | Status 2026-09-14 |
 |---------|--------|-------------------|
-| Nested monorepo (workflow not at GitHub root) | Human extract / subtree-split | **Open** |
-| No public `chw-companion` GitHub repo | Human `gh repo create` | **Open** |
-| Pages source not set to Actions | Human GitHub Settings | **Open** (after push) |
-| Fake `github.io` URL in README | Fixed — README must not invent a URL until Pages exists | OK |
+| Nested monorepo (workflow not at GitHub root) | Human extract / subtree-split | **Done** (extracted to standalone repo) |
+| No public `chw-companion` GitHub repo | Human `gh repo create` | **Done** |
+| Pages source not set to Actions | Human GitHub Settings | **Done** (`build_type=workflow`) |
+| Fake `github.io` URL in README | Fixed — README must not invent a URL until Pages exists | **Live URL pasted** |
 | Cache tagged `gemma-3-1b-it` while live is Gemma 4 | Documented honesty; optional later regen on Kaggle | OK |
-| Commit of local chw-companion changes | Human (ops pass did not commit) | **Open** if you want split to include latest |
+| Commit of local chw-companion changes | Human (ops pass did not commit) | **Done** for Pages publish |
 
 ---
 
