@@ -1,8 +1,21 @@
 # CHW Companion
 
-**An AI-assisted clinical triage tool for Community Health Workers (CHWs) in low-resource settings.**
+**Cache-first triage PWA for Community Health Workers** — decision support, not a medical device.
+
+**Live demo:** https://entexcelsiorent-cyber.github.io/chw-companion/  
+**Record later:** [`DEMO.md`](./DEMO.md) (honest shot list). Public repo: https://github.com/entexcelsiorent-cyber/chw-companion
 
 Built for the Gemma 4 Good Hackathon (Kaggle × Google DeepMind, 2026). Apache 2.0.
+
+---
+
+## Portfolio story (30 seconds)
+
+1. Open the live URL → sticky disclaimer + **CACHE-FIRST** badge.
+2. Tap a sample patient → sub-ms curated cache response + emergency override floor.
+3. Optional: set `window.CHW_BACKEND` for live Gemma 4 (not required for Pages).
+
+**Not shipped:** on-device generative Gemma, clinical validation, or 140-language clinical parity.
 
 ---
 

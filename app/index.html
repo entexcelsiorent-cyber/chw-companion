@@ -152,6 +152,23 @@
 
   .safety-banner strong { font-weight: 600; }
 
+  /* Above-fold product story (cache-first honesty) */
+  .demo-story {
+    margin: 12px 16px 0;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #e8f0e8 0%, #f5f2eb 100%);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .demo-story strong {
+    color: var(--forest);
+    font-weight: 600;
+  }
+
   /* ── Screens ── */
   .screen {
     flex: 1;
@@ -817,19 +834,24 @@
       </div>
       <div class="status-badge" id="status-badge">
         <div class="status-dot"></div>
-        <span id="status-text">LIVE</span>
+        <span id="status-text">CACHE-FIRST</span>
       </div>
     </div>
   </header>
 
   <!-- Always-visible safety disclaimer (non-dismissible) -->
   <div class="safety-banner" role="note" aria-label="Safety disclaimer">
-    <strong>Decision support tool only. Not a diagnosis.</strong>
-    Always use your clinical judgment. When uncertain, escalate urgency.
+    <strong>Decision support only — not a medical device or diagnosis.</strong>
+    Use clinical judgment. Escalate when uncertain. Not FDA/WHO validated.
   </div>
 
   <!-- ── SCREEN 1: Assessment Form ── -->
   <div class="screen active" id="form-screen">
+
+    <div class="demo-story" role="note">
+      <strong>Portfolio demo:</strong> curated offline cache (gemma-3 tagged) + emergency override.
+      Optional live Gemma 4 only if you set a backend. Tap a sample patient for the cache-first path.
+    </div>
 
     <div class="card">
       <div class="card-label">Patient Information</div>
@@ -914,7 +936,7 @@
   <div class="screen" id="loading-screen">
     <div class="spinner-ring"></div>
     <div class="loading-text">Assessing patient…</div>
-    <div class="loading-sub">Primary verdict in ~7 seconds, full detail streams in behind it</div>
+    <div class="loading-sub" id="loading-sub">Cache hits are instant; live backend (if set) ≈7 s warm</div>
     <div class="loading-steps">
       <div class="loading-step" id="step-1">
         <div class="step-dot"></div>
@@ -1903,8 +1925,10 @@
       badge.classList.remove('offline');
       text.textContent = data.mode === 'gemma4' ? 'LIVE · GEMMA 4' : 'LIVE · MOCK';
     } catch {
+      // Pages demo has no backend: online browsers still use curated cache.
+      // Reserve "OFFLINE" for true navigator offline so the badge is not alarming.
       badge.classList.add('offline');
-      text.textContent = 'OFFLINE (CACHED)';
+      text.textContent = navigator.onLine ? 'CACHE-FIRST' : 'OFFLINE · CACHE';
     }
   }
 
