@@ -277,6 +277,8 @@
     border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
+    font-family: inherit;
+    color: inherit;
     cursor: pointer;
     user-select: none;
     transition: all 0.15s;
@@ -890,9 +892,9 @@
       <div class="card-label">Sample Patients (Demo)</div>
       <div class="quick-label">Tap to load a canonical case:</div>
       <div class="quick-chips">
-        <div class="chip" onclick="loadSample('malaria-pediatric-fever')">🧒 Malaria · child</div>
-        <div class="chip" onclick="loadSample('snakebite-adult-limb')">🐍 Snake bite · adult</div>
-        <div class="chip" onclick="loadSample('swahili-homa-mtoto')">🇰🇪 Mtoto · Swahili</div>
+        <button type="button" class="chip" onclick="loadSample('malaria-pediatric-fever')">🧒 Malaria · child</button>
+        <button type="button" class="chip" onclick="loadSample('snakebite-adult-limb')">🐍 Snake bite · adult</button>
+        <button type="button" class="chip" onclick="loadSample('swahili-homa-mtoto')">🇰🇪 Mtoto · Swahili</button>
       </div>
     </div>
 
@@ -900,16 +902,16 @@
       <div class="card-label">Chief Complaint</div>
       <div class="quick-label">Quick select (tap to add):</div>
       <div class="quick-chips">
-        <div class="chip" onclick="addChip(this, 'fever')">🌡 Fever</div>
-        <div class="chip" onclick="addChip(this, 'cough')">😮‍💨 Cough</div>
-        <div class="chip" onclick="addChip(this, 'diarrhoea')">💧 Diarrhoea</div>
-        <div class="chip" onclick="addChip(this, 'vomiting')">🤢 Vomiting</div>
-        <div class="chip" onclick="addChip(this, 'difficulty breathing')">🫁 Breathing difficulty</div>
-        <div class="chip" onclick="addChip(this, 'convulsions')">⚡ Convulsions</div>
-        <div class="chip" onclick="addChip(this, 'unconscious')">😶 Unconscious</div>
-        <div class="chip" onclick="addChip(this, 'severe pain')">😣 Severe pain</div>
-        <div class="chip" onclick="addChip(this, 'rash')">🔴 Rash</div>
-        <div class="chip" onclick="addChip(this, 'bleeding')">🩸 Bleeding</div>
+        <button type="button" class="chip" onclick="addChip(this, 'fever')">🌡 Fever</button>
+        <button type="button" class="chip" onclick="addChip(this, 'cough')">😮‍💨 Cough</button>
+        <button type="button" class="chip" onclick="addChip(this, 'diarrhoea')">💧 Diarrhoea</button>
+        <button type="button" class="chip" onclick="addChip(this, 'vomiting')">🤢 Vomiting</button>
+        <button type="button" class="chip" onclick="addChip(this, 'difficulty breathing')">🫁 Breathing difficulty</button>
+        <button type="button" class="chip" onclick="addChip(this, 'convulsions')">⚡ Convulsions</button>
+        <button type="button" class="chip" onclick="addChip(this, 'unconscious')">😶 Unconscious</button>
+        <button type="button" class="chip" onclick="addChip(this, 'severe pain')">😣 Severe pain</button>
+        <button type="button" class="chip" onclick="addChip(this, 'rash')">🔴 Rash</button>
+        <button type="button" class="chip" onclick="addChip(this, 'bleeding')">🩸 Bleeding</button>
       </div>
     </div>
 
@@ -1079,7 +1081,7 @@
 
   <!-- Powered by — honest: offline = curated cache; live Gemma optional when online -->
   <div class="powered-by">
-    Offline curated cache · Optional <span class="gemma-badge">Gemma 4</span> when online · Demo languages (EN/SW/FR/HA)
+    Offline curated cache · Optional live <span class="gemma-badge">Gemma 4</span> only with backend · Demo languages (EN/SW/FR/HA)
   </div>
 
 </div>
@@ -1864,11 +1866,39 @@
   // scenario by id in the cached scenarios, stuffs user_prompt into the
   // textarea, and scrolls it into view. Does NOT auto-submit — the demo
   // presenter clicks "Assess Patient" themselves.
+  function parseDemoDemographics(prompt) {
+    const text = String(prompt || '');
+    let sex = 'unknown';
+    if (/\bfemale\b|\bwoman\b|\bgirl\b|\bmtoto wa kike\b|\bmwanamke\b/i.test(text)) sex = 'female';
+    else if (/\bmale\b|\bman\b|\bboy\b|\bgarçon\b|\byaro\b/i.test(text)) sex = 'male';
+    let age = '';
+    const m =
+      text.match(/\bage\s+(\d+)\s*(years?|yrs?|y|months?|mos?|m)?\b/i) ||
+      text.match(/\bmiaka\s+(\d+)\b/i) ||
+      text.match(/\bumri\s+miaka\s+(\d+)\b/i) ||
+      text.match(/,\s*(\d+)\s*ans\b/i) ||
+      text.match(/\b(\d+)\s*ans\b/i) ||
+      text.match(/\bwatanni\s+(\d+)\b/i) ||
+      text.match(/\bage\s+(\d+)\b/i);
+    if (m) {
+      const n = m[1];
+      const unit = (m[2] || '').toLowerCase();
+      if (/month|mo\b|^m$|watanni/.test(unit) || /watanni/.test(m[0])) age = `${n}mo`;
+      else age = `${n}y`;
+    }
+    return { age, sex };
+  }
+
   function loadSample(scenarioId) {
     const find = () => (CACHED_SCENARIOS || []).find(s => s.id === scenarioId);
     const apply = sc => {
       const ta = document.getElementById('symptoms');
       ta.value = sc.user_prompt;
+      const demo = parseDemoDemographics(sc.user_prompt);
+      const ageEl = document.getElementById('patient-age');
+      const sexEl = document.getElementById('patient-sex');
+      if (ageEl && demo.age) ageEl.value = demo.age;
+      if (sexEl && demo.sex !== 'unknown') sexEl.value = demo.sex;
       selectedChips = [];
       document.querySelectorAll('.chip.selected').forEach(c => c.classList.remove('selected'));
       updateCount(ta);
